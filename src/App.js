@@ -1,10 +1,10 @@
-import React from 'react';
+import React from 'react'
 import Canvas from './canvas/Canvas'
 import './style.css'
-function App() {
+function App () {
   return (
-    <Canvas/>
-  );
+    <Canvas />
+  )
 }
 
-export default App;
+export default App
