@@ -2,6 +2,7 @@ export default async (canvas, game) => {
   // set window size
   const ctx = canvas.getContext('2d')
   const { width, height } = canvas.getBoundingClientRect()
+  ctx.clearRect(0, 0, width, height)
 
   function drawHexagon (center, size) {
     // get corners
@@ -47,14 +48,21 @@ export default async (canvas, game) => {
   drawHexagon({ x: width / 2, y: height / 2 }, 50)
 
   // draw X across the screen
-  // ctx.beginPath()
-  // ctx.moveTo(0, 0)
-  // ctx.lineTo(width, height);
-  // ctx.strokeStyle = '#9B99FF'
-  // ctx.stroke()
-  // ctx.beginPath()
-  // ctx.moveTo(width, 0)
-  // ctx.lineTo(0, height);
-  // ctx.strokeStyle = '#9B99FF'
-  // ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(0, 0)
+  ctx.lineTo(width, height)
+  ctx.strokeStyle = '#9B99FF'
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(width, 0)
+  ctx.lineTo(0, height)
+  ctx.strokeStyle = '#9B99FF'
+  ctx.stroke()
+
+  // draw a circle at cursor
+  ctx.beginPath()
+  ctx.arc(game.clientX, game.clientY, 2, 0, 2 * Math.PI)
+  ctx.fillStyle = '#FF8B93'
+  ctx.closePath()
+  ctx.fill()
 }

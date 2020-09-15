@@ -1,9 +1,10 @@
-import { useCallback } from 'react'
+export default class InputHandler {
+  constructor (setState) {
+    const moveMouseHandler =
+      ({ clientX, clientY }) => {
+        setState({ clientX, clientY })
+      }
 
-document.addEventListener('mousemove', moveMouseHandler)
-
-const moveMouseHandler = useCallback(
-  ({ clientX, clientY }) => {
-    console.log(`X:${clientX};Y:${clientY}`)
+    window.addEventListener('mousemove', moveMouseHandler)
   }
-)
+}

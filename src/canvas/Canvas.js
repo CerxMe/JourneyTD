@@ -1,28 +1,41 @@
 
-import React, {} from 'react'
+import React, { useState } from 'react'
 import drawScene from './drawScene'
 import resize from './resize'
+import InputHandler from './inputHandler'
 
 class Canvas extends React.Component {
   constructor (props) {
     super(props)
     this.canvasRef = React.createRef()
+    this.state = {
+      game: {},
+      inputData: {}
+    }
+  }
+
+  // draw scene
+  renderGame (canvasRef, game) {
+    resize(canvasRef, game)
+    drawScene(canvasRef.current, game)
   }
 
   componentDidMount () {
+    // listen for user input
+    const inputHandler = new InputHandler((inputData) => this.setState({ inputData }))
     // handle resizing window
     const canvas = this.canvasRef.current
     window.addEventListener('resize', () => {
-      resize(this.canvasRef)
-      drawScene(canvas, {})
+      this.renderGame(this.canvasRef, this.state.inputData)
     })
 
-    async function runGame (canvasRef) {
-      const game = {}
-      await resize(canvasRef, game)
-      await drawScene(canvas, game)
-    }
-    runGame(this.canvasRef)
+    // draw scene
+    this.renderGame(this.canvasRef, this.state.inputData)
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    console.log(this.state.inputData)
+    this.renderGame(this.canvasRef, this.state.inputData)
   }
 
   componentWillUnmount () {
