@@ -3,7 +3,6 @@ export default async (canvasRef, game) => {
   function resizeCanvas () {
     if (canvasRef) {
       const canvas = canvasRef.current
-      console.log(canvas)
       if (canvas) {
         const { width, height } = canvas.getBoundingClientRect()
         if (canvas.width !== width || canvas.height !== height) {

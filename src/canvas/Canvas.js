@@ -22,7 +22,8 @@ class Canvas extends React.Component {
 
   componentDidMount () {
     // listen for user input
-    const inputHandler = new InputHandler((inputData) => this.setState({ inputData }))
+    const game = this.state
+    const inputHandler = new InputHandler((inputData, game) => this.setState({ inputData }))
     // handle resizing window
     const canvas = this.canvasRef.current
     window.addEventListener('resize', () => {
@@ -34,7 +35,6 @@ class Canvas extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    console.log(this.state.inputData)
     this.renderGame(this.canvasRef, this.state.inputData)
   }
 

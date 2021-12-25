@@ -42,22 +42,20 @@ export default async (canvas, game) => {
     // ctx.shadowColor = '#B7FFBD'
     ctx.strokeStyle = '#B7FFBD'
     ctx.stroke()
-
-    console.log(corners)
   }
   drawHexagon({ x: width / 2, y: height / 2 }, 50)
 
   // draw X across the screen
-  ctx.beginPath()
-  ctx.moveTo(0, 0)
-  ctx.lineTo(width, height)
-  ctx.strokeStyle = '#9B99FF'
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.moveTo(width, 0)
-  ctx.lineTo(0, height)
-  ctx.strokeStyle = '#9B99FF'
-  ctx.stroke()
+  // ctx.beginPath()
+  // ctx.moveTo(0, 0)
+  // ctx.lineTo(width, height)
+  // ctx.strokeStyle = '#9B99FF'
+  // ctx.stroke()
+  // ctx.beginPath()
+  // ctx.moveTo(width, 0)
+  // ctx.lineTo(0, height)
+  // ctx.strokeStyle = '#9B99FF'
+  // ctx.stroke()
 
   // draw a circle at cursor
   ctx.beginPath()
