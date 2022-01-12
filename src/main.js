@@ -1,9 +1,20 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
+import './tailwind.css'
 import App from './App.vue'
-import './registerServiceWorker'
+import { routes } from './routes.js'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createPinia } from 'pinia'
 
-Vue.config.productionTip = false
+const app = createApp(App)
 
-new Vue({
-  render: h => h(App)
-}).$mount('#app')
+// Use store
+app.use(createPinia())
+
+// Use router
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+app.use(router)
+
+app.mount('#app')

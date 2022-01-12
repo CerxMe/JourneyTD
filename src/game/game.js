@@ -1,19 +1,7 @@
-// class GameManager() {
-//     constructor() {
-//         this.game = new Game();
-//         this.game.init();
-//     }
-//
-//     update() {
-//         this.game.update();
-//     }
-//
-//     render() {
-//         this.game.render();
-//     }
-// }
-
-import HexGrid from './hexgrid'
+import Hex from './objects/hex'
+import HexGrid from './objects/hexGrid'
+// import Map from './objects/map'
+// import Player from './objects/player'
 
 // the game renders two layers of hexes, one for the background and one for the foreground
 // the background layer is rendered first - it is an infinite grid of hexes with an origin at 0, 0 and excludes all the hexes from the foreground layer
@@ -26,7 +14,7 @@ import HexGrid from './hexgrid'
 
 // the camera is anchored in a configurable position in the Z axis above the player's position
 // the camera is moved to the player's position and the foreground layer's origin is recalculated
-// before rendering both layers, the camera's frustum is checked to see if the objects are within the camera's frustum are visible.
+// before rendering both layers, the camera's frustum is checked to see if the objects within the camera's frustum are visible.
 // if the object is not visible, it is not rendered.
 export class Game {
   // initiates with the canvas element and the renderers the scene
@@ -64,17 +52,24 @@ export class Game {
     // const hexagonHeight = Math.sqrt(3) * hexagonRadius
     // const hexagonWidth = 2 * hexagonRadius
 
+    // const initialViewDistance = 4
+    // const gameMap = new HexGrid(initialViewDistance, 1) // create a new hex grid with the initial view distance
+    // // populate hexes with data
+    // gameMap.populateMap()
+    //
+    // this.gameMap = gameMap
+
     // renders backround hexagon grid
     console.log('hex grid background')
     this.hexGrid = new HexGrid(this.hexagonsPerScreen, 1)
     console.log('hex grid ok')
     const hexes = this.hexGrid.getHexes()
     const hexMap = this.hexGrid.map
-    hexMap.forEach(hex => {
-      console.log('hex', hex) // hex
+    const backgroundHexagons = hexMap.forEach(hex => {
+      // console.log('hex', hex) // hex
       const position = hex.center
       //  draw (position, size, color, offset)
-      const dimensions = { width: 0.8, height: 0.1 }
+      const dimensions = { width: 0.88, height: 0.22 }
       const mesh = hex.draw(position, dimensions) // get the mesh and add it to the scene
       this.objects.push(mesh)
     })
@@ -88,7 +83,7 @@ export class Game {
   }
 
   setZoomLevel (setting) {
-    const hexagonsPerScreen = { small: 8, medium: 24, large: 64 }
+    const hexagonsPerScreen = { small: 30, medium: 24, large: 64 }
     if (Object.keys(hexagonsPerScreen).includes(setting)) {
       this.hexagonsPerScreen = hexagonsPerScreen[setting]
       // this.update()

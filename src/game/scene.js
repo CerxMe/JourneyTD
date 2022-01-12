@@ -32,22 +32,15 @@ export default class Scene {
 
     // on window resize
     window.addEventListener('resize', () => {
-      // resize the canvas
-      this.canvas.width = window.innerWidth
-      this.canvas.height = window.innerHeight
-
-      // update the camera
-      this.camera.aspect = window.innerWidth / window.innerWidth
+      this.camera.aspect = window.innerWidth / window.innerHeight
       this.camera.updateProjectionMatrix()
-
-      // update the renderer size
       this.renderer.setSize(window.innerWidth, window.innerHeight)
     }, false)
 
     // on camera movement change
     this.controls.addEventListener('change', () => {
       this.renderer.render(this.scene, this.camera)
-      this.cameraMovedHandler()
+      // this.cameraMovedHandler()
     })
   }
 
@@ -90,6 +83,7 @@ export default class Scene {
 
     // render the game objects on the scene
     const gameObjects = this.game.getObjects()
+    console.log(gameObjects)
     for (const gameObject of gameObjects) {
       this.scene.add(gameObject)
     }
@@ -214,8 +208,7 @@ export default class Scene {
   }
 
   createCamera () {
-    const size = this.getCanvasSize()
-    const camera = new THREE.PerspectiveCamera(45, size.width / size.height, 10, 1000)
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000)
     camera.position.set(0, 0, 16)
     // draw a box at the camera's position
     // set the camera's position to the center of the box
@@ -224,19 +217,15 @@ export default class Scene {
     this.camera = camera
   }
 
-  // get canvas size
-  getCanvasSize () {
-    const width = this.canvas.clientWidth
-    const height = this.canvas.clientHeight
-    return { width, height }
-  }
-
   createRenderer () {
-    const renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true })
-    renderer.setAnimationLoop(() => {
-      this.renderer.render(this.scene, this.camera)
+    const renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas
+      // antialias: true
     })
-    renderer.setSize(this.getCanvasSize().width, this.getCanvasSize().height)
+    renderer.setAnimationLoop(() => {
+      renderer.render(this.scene, this.camera)
+    })
+    renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer = renderer
   }
 

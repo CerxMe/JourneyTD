@@ -1,130 +1,11 @@
 import * as THREE from 'three'
 
-// Hexagons have 6 sides and 6 corners. Each side is shared by 2 hexagons. Each corner is shared by 3 hexagons.
-export default class HexGrid {
-  // Now let's assemble hexagons into a grid.
-  // With square grids, there's one obvious way to do it. With hexagons, there are multiple approaches.
-  // I like cube coordinates for algorithms and axial or doubled for storage.
-
-  constructor (mapSize, hexSize) {
-    this.mapSize = mapSize
-    this.hexSize = hexSize
-    this.map = []
-    this.pts = []
-    this.createMap()
-    // for each point create a new map hex
-  }
-
-  // Called on initialization, assigns hexes with starting properties
-  populateMap () {
-    // Assign random properties to all points
-    for (const hex in this.map) {
-      // give each hex a random color
-      this.randomizeHex(hex)
-    }
-    // When called on initialization, assign the starting position a special value
-    // get the center hexagon from the map
-    const center = this.getCenterHex()
-    center.setStart()
-  }
-
-  // Randomize Hex's properties
-  randomizeHex (hex) {
-    hex.randomizeHex()
-    console.log(hex)
-  }
-
-  // The cube coordinates are the simplest. They're the coordinates of the center of the hexagon.
-  createMap () {
-    console.log('generating hex map')
-    // create a 2d map of hexagons
-    console.log('map size: ', this.mapSize)
-    console.log('hex size: ', this.hexSize)
-
-    // generate a hexagonal grid
-    const pts = []
-    // center hex
-    pts.push(new THREE.Vector3())
-    // outside rings
-    const unit = Math.sqrt(3)
-    const angle = Math.PI / 3
-    const axis = new THREE.Vector3(0, 0, 1)
-    const axisVector = new THREE.Vector3(0, -unit, 0)
-    const sideVector = new THREE.Vector3(0, unit, 0).applyAxisAngle(axis, -angle)
-    // number of rings from the center
-    const circleCount = this.mapSize
-    const tempV3 = new THREE.Vector3()
-    for (let seg = 0; seg < 6; seg++) {
-      for (let ax = 1; ax <= circleCount; ax++) {
-        for (let sd = 0; sd < ax; sd++) {
-          tempV3.copy(axisVector)
-            .multiplyScalar(ax)
-            .addScaledVector(sideVector, sd)
-            .applyAxisAngle(axis, angle * seg)
-          pts.push(new THREE.Vector3().copy(tempV3))
-        }
-      }
-    }
-    console.log(pts)
-    this.pts = pts
-
-    for (const point of pts) {
-      const hex = new Hex(point, this.cubeToAxial(point), this.hexSize)
-      console.log(' map point saved')
-      this.map.push(hex)
-    }
-    console.log(this.map)
-  }
-
-  getHex (axial) {
-    // get the hexagon at the given coordinates
-    return this.getHexByAxial(axial)
-  }
-
-  // The axial coordinates are the coordinates of the center of the hexagon. They're the coordinates of the center of the hexagon.
-  cubeToAxial (cube) {
-    // convert cube coordinates to axial coordinates
-    const q = cube.x
-    const r = cube.z
-    return new THREE.Vector2(q, r)
-  }
-
-  getHexByAxial (axial) {
-    // get the hexagon at the given axial coordinates
-    const q = axial.x
-    const r = axial.y
-    const index = q + r * (this.mapSize + (this.mapSize - 1))
-    return this.map[index]
-  }
-
-  addHex (hex) {
-    // add a hexagon to the map
-    this.map.push(hex)
-  }
-
-  getHexes () {
-    return this.map
-  }
-
-  getAdjacentHexToHex (hex) {
-    const cube = this.axialToCube(hex.axial)
-    const adjacentHexes = []
-    for (let i = 0; i < 6; i++) {
-      const adjCube = this.getAdjacentCube(cube, i)
-      const adjHex = this.getHex(adjCube)
-      adjacentHexes.push(adjHex)
-    }
-    return adjacentHexes
-  }
-
-  getCenterHex () {
-    const cube = new THREE.Vector3(this.mapSize / 2, this.mapSize / 2, this.mapSize / 2)
-    return this.getHex(cube)
-  }
-}
-
-class Hex {
+// Represents a single hexagon object in the game
+export default class Hex {
+  // Create a new hexagon with the given coordinates
+  // The size of the hexagon is determined by the given scale parameter
   constructor (cube, axial, size) {
+    // Hexagons have 6 sides and 6 corners. Each side is shared by 2 hexagons. Each corner is shared by 3 hexagons.
     this.cube = cube
     this.color = new THREE.Color(0x00100b)
     // this.color = new THREE.Color(0x14BDEB)
@@ -152,6 +33,7 @@ class Hex {
     }
   }
 
+  // Calculate the center position of the hexagon
   getCenter () {
     const center = new THREE.Vector3(this.cube.x * this.size, this.cube.y * this.size, this.cube.z * this.size)
     return center
@@ -161,6 +43,7 @@ class Hex {
     return this.size
   }
 
+  // Returns and array of the 6 points of the hexagon in clockwise order starting from the top left corner
   getCorners () {
     const corners = []
     for (let i = 0; i <= 6; i++) {
@@ -174,6 +57,7 @@ class Hex {
     return corners
   }
 
+  // Returns an array of the 6 sides of the hexagon in clockwise order starting from the top left corner
   getSides () {
     const sides = []
     for (let i = 0; i <= 6; i++) {
@@ -187,6 +71,8 @@ class Hex {
     return sides
   }
 
+  // Returns the center position of a side of the hexagon given the side parameter
+  // TODO: fix this function
   getCenterOfSide (side) {
     const angle = side * Math.PI / 3
     const x = this.cube.x + Math.cos(angle) * this.size
@@ -196,6 +82,7 @@ class Hex {
     return center
   }
 
+  // Creates a new 3D Object to draw on the scene with the given parameters
   draw (position, dimensions) {
     const { height, width } = dimensions
     // const { x, y, z } = position
