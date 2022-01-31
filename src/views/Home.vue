@@ -1,28 +1,74 @@
 <script setup>
-// TODO
+// import { useGameDataStore } from '../store/gameData'
+// import { ref, onMounted, onUnmounted } from 'vue'
+//
+// const gameData = useGameDataStore()
+
 </script>
 
-<template>
-  <div class="bg-gray-50">
-    <div
-      class="max-w-screen-xl px-4 py-12 mx-auto sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between"
-    >
-      <h2
-        class="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 sm:text-4xl sm:leading-10"
-      >
-        Ready to dive in?
-        <br />
-        <span class="text-indigo-600">Vite + Vue 3 + Tailwind CSS</span>
-      </h2>
-      <div class="flex mt-8 lg:flex-shrink-0 lg:mt-0">
-        <div class="inline-flex rounded-md shadow">
-          <router-link
-            to="/play"
-            class="inline-flex items-center justify-center px-5 py-3 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-500 focus:outline-none"
-            >Next Page</router-link
-          >
-        </div>
-      </div>
-    </div>
-  </div>
+<template lang="pug">
+.gameStartScreen.hex
+  header
+    h1 Journey TD
+    RouterLink(to="/game")
+      span.startGame
+        | Start Game
 </template>
+
+<style lang="stylus" scoped>
+// UI Colors
+// https://lospec.com/palette-list/blessing
+color1 = #74569b
+color2 = #96fbc7
+color3 = #f7ffae
+color4 = #ffb3cb
+color5 = #d8bfd8
+
+// mixin for default flex behaviour
+flex()
+  display flex
+  flex-direction column
+  align-items center
+  justify-content center
+
+// component styles
+.gameStartScreen
+  flex()
+  width 100%
+  height 100%
+  background color1
+  color: color3
+  header
+    flex()
+    padding 1em
+    border-radius .3em
+    border solid 1px color5
+a
+  color: color2
+  text-decoration: none
+  &:hover
+    color: #fff
+.startGame
+  font-weight: bold
+  margin-top: 1em
+  cursor: pointer
+
+.hex:before {
+  content: " ";
+
+  width: 0;
+  border-bottom: 30px solid color4;
+  border-left: 52px solid transparent;
+  border-right: 52px solid transparent;
+}
+
+.hex:after {
+  content: "";
+
+  width: 0;
+  border-top: 30px solid color4;
+  border-left: 52px solid transparent;
+  border-right: 52px solid transparent;
+}
+
+</style>

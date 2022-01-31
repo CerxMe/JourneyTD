@@ -10,60 +10,6 @@ export default class Scene {
     this.setup()
   }
 
-  registerEvents () {
-    // // pixel to hex
-    // const mouse = new THREE.Vector2()
-    // const raycaster = new THREE.Raycaster()
-    // const mouseMove = (event) => {
-    //   mouse.x = (event.clientX / innerWidth) * 2 - 1
-    //   mouse.y = -(event.clientY / innerHeight) * 2 + 1
-    //   raycaster.setFromCamera(mouse, this.camera)
-    //   const intersects = raycaster.intersectObjects(this.scene.children)
-    //   if (intersects.length > 0) {
-    //     const intersect = intersects[0]
-    //     const hex = intersect.point.clone()
-    //     const hexPos = hex.applyMatrix4(this.camera.matrixWorldInverse)
-    //     const hexGrid = hexPos.applyMatrix4(this.camera.projectionMatrix)
-    //     // set the color of the hexagon to white
-    //     intersect.object.material.color.set(0xffff00)
-    //   }
-    // }
-    // this.canvas.addEventListener('mousemove', mouseMove)
-
-    // on window resize
-    window.addEventListener('resize', () => {
-      this.camera.aspect = window.innerWidth / window.innerHeight
-      this.camera.updateProjectionMatrix()
-      this.renderer.setSize(window.innerWidth, window.innerHeight)
-    }, false)
-
-    // on camera movement change
-    this.controls.addEventListener('change', () => {
-      this.renderer.render(this.scene, this.camera)
-      // this.cameraMovedHandler()
-    })
-  }
-
-  // cameraMovedHandler () {
-  //   console.log('camera moved')
-  //   console.log(this.camera.position)
-  //
-  //   // limit the orbit to a maximum radius of 10 hexes from the center of the map
-  //   const maxRadius = 10
-  //   const center = this.hexGrid.center
-  //   const distance = this.camera.position.distanceTo(center)
-  //   if (distance > maxRadius) {
-  //     const direction = this.camera.position.clone().sub(center).normalize()
-  //     this.camera.position.copy(center).add(direction.multiplyScalar(maxRadius))
-  //   }
-  // }
-
-  // // translates the camera position to the hexagon grid
-  // updateMap (cameraPosition) {
-  //   // generate a hexagon grid from the camera position and the grid size (hexagon size) and the grid offset (hexagon offset) and the grid height (hexagon height) and the grid width (hexagon width) and the grid depth (hexagon depth) and the grid height (hexagon height)
-  //   const hexGrid = this.hexGrid.generate(cameraPosition, this.hexGridSize, this.hexGridOffset, this.hexGridHeight, this.hexGridWidth, this.hexGridDepth, this.hexGridHeight)
-  // }
-
   // setup the scene
   setup () {
     // make things draw
@@ -71,23 +17,11 @@ export default class Scene {
     this.createScene()
     this.createCamera()
     this.createRenderer()
-    this.createControls()
-    // register even listeners for controls
-    console.log('register events')
-    this.registerEvents()
     // start game
     this.game = new Game(this.canvas)
     console.log('game started')
     console.log(this.game)
     this.game.init()
-
-    // render the game objects on the scene
-    const gameObjects = this.game.getObjects()
-    console.log(gameObjects)
-    for (const gameObject of gameObjects) {
-      this.scene.add(gameObject)
-    }
-    // start the game loop
     this.gameLoop()
   }
 
@@ -139,7 +73,7 @@ export default class Scene {
     const axisVector = new THREE.Vector3(0, -unit, 0)
     const sideVector = new THREE.Vector3(0, unit, 0).applyAxisAngle(axis, -angle)
     // number of rings from the center
-    const circleCount = 9
+    const circleCount = 1
     const tempV3 = new THREE.Vector3()
     for (let seg = 0; seg < 6; seg++) {
       for (let ax = 1; ax <= circleCount; ax++) {
@@ -227,18 +161,5 @@ export default class Scene {
     })
     renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer = renderer
-  }
-
-  createControls () {
-    const controls = new OrbitControls(this.camera, this.canvas)
-    // disable every action exept the camera pan
-    // controls.enableDamping = true
-    // controls.dampingFactor = 0.25
-    // controls.enableZoom = false
-    // controls.enablePan = true
-    // controls.enableRotate = false
-    // controls.enableKeys = false
-    controls.update()
-    this.controls = controls
   }
 }

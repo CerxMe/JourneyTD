@@ -83,7 +83,7 @@ export class Game {
   }
 
   setZoomLevel (setting) {
-    const hexagonsPerScreen = { small: 30, medium: 24, large: 64 }
+    const hexagonsPerScreen = { small: 3, medium: 24, large: 64 }
     if (Object.keys(hexagonsPerScreen).includes(setting)) {
       this.hexagonsPerScreen = hexagonsPerScreen[setting]
       // this.update()

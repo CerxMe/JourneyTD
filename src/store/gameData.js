@@ -1,59 +1,63 @@
 import { defineStore } from 'pinia'
 import HexGrid from '../game/objects/hexGrid'
+import * as Seedrandom from 'seedrandom'
+import { ref } from 'vue'
+import { SHA3 } from 'sha3'
+const hash = new SHA3(512)
 
-export const useGameDataStore = defineStore('gameData', () => {
-  // actions
-  function generateTiles () {
-    const mapsize = 3 // initial view distance
-    const hexsize = 1
-    const tiles = new HexGrid(mapsize, hexsize)
-    console.log('STORE TILES GENERATED', tiles)
-    return tiles
-  }
-
-  // initialize the game data
-  const tiles = generateTiles()
-  // set state
-  const state = {
-    player: {
-      position: {
-        x: 0,
-        y: 0
-      }
+export const useGameDataStore = defineStore({
+  id: 'gameData',
+  state: () => ({
+    seed: null,
+    rng: null,
+    tiles: null,
+    gameState: 'startScreen'
+  }),
+  actions: {
+    startGame () {
+      this.gameState = 'game'
     },
-    map: {
-      center: {
-        x: 0,
-        y: 0
-      },
-      zoom: 1,
-      storedTiles: tiles, // stores generated data in the map
-      renderedTiles: [] // transforms stored data into a renderable format
+    generateTiles () {
+      const mapsize = 6 // initial view distance
+      const hexsize = 1
+
+      /*
+      Generates a hashtable for cube projection of hex coordinates
+      Horizontal lines have constant "y" coordinate. Diagonal lines have constant "x" and "z" coordinates. Neighboring cells differ by 1 in two coordinates.
+
+      Distance: max(|dx|,|dy|,|dz|)
+      Storage: 6*(2*(max(|dx|,|dy|,|dz|)+1))
+      Neighbors: (1,0,-1); (-1,0,1); (0,1,-1); (0,-1,1); (1,-1,0); (-1,1,0)
+      Straight lines: (x ± n, y, z ∓ n); (x ± n, y ∓ n, z); (x, y ± n, z ∓ n)
+      Remarks: x+y+z = 0; x, y, z ∈ ℕ
+      */
+
+      // console.log('RNG')
+      // for (let j = 0; j < mapsize; j++) {
+      //   const random = getRng()
+      //   console.log()
+      // }
+
+      const hexagons = new HexGrid(mapsize, mapsize, hexsize)
+      this.tiles = hexagons
+    },
+
+    // The entropy is a string of random parameters generated from user's inputs
+    setEntropy (entropy) {
+      // hashes the entropy and sets the seed
+      hash.update(entropy.toString() || '')
+      this.seed = hash.digest('hex')
+      this.rng = new Seedrandom(this.seed, { entropy: true })
+      this.generateTiles()
+      return this.seed
+    }
+  },
+  getters: {
+    getRng () {
+      if (this.rng.value) {
+        const random = this.rng()
+        return random
+      }
     }
   }
-  return { state, generateTiles }
-  //
-  //
-  // },
-  // // could also be defined as
-  // // state: () => ({ count: 0 })
-  // actions: {
-  //   // movePlayer (position) {
-  //   //   this.player.position = position
-  //   //   this.updateRenderedTiles() // update the rendered tiles
-  //   // },
-  //   // updateRenderedTiles () {
-  //   //   // update the rendered tiles
-  //   //   this.map.renderedTiles = this.map.storedTiles.map(tile => {
-  //   //     return {
-  //   //       ...tile,
-  //   //       position: {
-  //   //         x: tile.position.x - this.map.center.x,
-  //   //         y: tile.position.y - this.map.center.y
-  //   //       }
-  //   //     }
-  //   //   })
-  //   // },
-  //
-  // }
 })

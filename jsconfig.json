@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": "../vvt-app",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  },
-  "exclude": ["node_modules", "dist"]
-}
