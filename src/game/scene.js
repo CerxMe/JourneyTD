@@ -1,12 +1,10 @@
 import * as THREE from 'three'
-// import OrbitControls
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { Game } from './game'
-
+import { toRaw } from '@vue/reactivity'
 export default class Scene {
   // initiates with the canvas element and the renderers the scene
-  constructor (canvas) {
+  constructor (canvas, gameData) {
     this.canvas = canvas
+    this.gameData = gameData
     this.setup()
   }
 
@@ -17,22 +15,22 @@ export default class Scene {
     this.createScene()
     this.createCamera()
     this.createRenderer()
-    // start game
-    this.game = new Game(this.canvas)
-    console.log('game started')
-    console.log(this.game)
-    this.game.init()
     this.gameLoop()
   }
 
-  update () {
-    // console.log('update')
-    // render the game objects on the scene
-    const gameObjects = this.game.getObjects()
-    for (const gameObject of gameObjects) {
-      this.scene.add(gameObject)
+  renderObjects (gameObjects) {
+    console.log('render objects')
+    console.log(gameObjects)
+    if (!!gameObjects && gameObjects.length > 0) {
+      for (const gameObject of gameObjects) {
+        this.scene.add(toRaw(gameObject))
+      }
     }
-    // console.log('renderingObjects:', gameObjects)
+  }
+
+  update () {
+    console.log('update scene')
+    this.renderObjects(this.gameData.getObjects)
   }
 
   gameLoop () {

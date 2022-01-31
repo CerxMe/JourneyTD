@@ -61,12 +61,13 @@ export class Game {
 
     // renders backround hexagon grid
     console.log('hex grid background')
-    this.hexGrid = new HexGrid(this.hexagonsPerScreen, 1)
+    const initialViewDistance = 4
+    const gameMap = new HexGrid(initialViewDistance, 1)
     console.log('hex grid ok')
-    const hexes = this.hexGrid.getHexes()
-    const hexMap = this.hexGrid.map
+    const hexes = gameMap.getHexes()
+    const hexMap = gameMap.map
     const backgroundHexagons = hexMap.forEach(hex => {
-      // console.log('hex', hex) // hex
+      console.log('hex', hex) // hex
       const position = hex.center
       //  draw (position, size, color, offset)
       const dimensions = { width: 0.88, height: 0.22 }

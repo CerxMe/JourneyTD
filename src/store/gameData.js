@@ -11,15 +11,16 @@ export const useGameDataStore = defineStore({
     seed: null,
     rng: null,
     tiles: null,
-    gameState: 'startScreen'
+    gameState: 'startScreen',
+    objects: null
   }),
   actions: {
     startGame () {
       this.gameState = 'game'
     },
     generateTiles () {
-      const mapsize = 6 // initial view distance
-      const hexsize = 1
+      const initialViewDistance = 3 // initial view distance
+      const hexSize = 1
 
       /*
       Generates a hashtable for cube projection of hex coordinates
@@ -38,8 +39,20 @@ export const useGameDataStore = defineStore({
       //   console.log()
       // }
 
-      const hexagons = new HexGrid(mapsize, mapsize, hexsize)
-      this.tiles = hexagons
+      // renders backround hexagon grid
+      console.log('generating hexes')
+      const gameMap = new HexGrid(initialViewDistance, hexSize)
+      const hexMap = gameMap.map
+      const objects = []
+      for (const hex of hexMap) {
+        // console.log('hex', hex) // hex
+        const position = hex.center
+        //  draw (position, size, color, offset)
+        const dimensions = { width: 0.88, height: 0.22 }
+        const mesh = hex.draw(position, dimensions) // get the mesh and add it to the scene
+        objects.push(mesh)
+      }
+      this.objects = objects
     },
 
     // The entropy is a string of random parameters generated from user's inputs
@@ -58,6 +71,9 @@ export const useGameDataStore = defineStore({
         const random = this.rng()
         return random
       }
+    },
+    getObjects () {
+      return this.objects
     }
   }
 })
