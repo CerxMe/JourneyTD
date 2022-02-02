@@ -16,20 +16,8 @@
 </template>
 
 <style lang="stylus" scoped>
-// UI Colors
-// https://lospec.com/palette-list/blessing
-color1 = #74569b
-color2 = #96fbc7
-color3 = #f7ffae
-color4 = #ffb3cb
-color5 = #d8bfd8
-
-// mixin for default flex behaviour
-flex()
-  display flex
-  flex-direction column
-  align-items center
-  justify-content center
+@import '../styles/variables.styl'
+@import '../styles/utils.styl'
 
 // component styles
 .gameStartScreen

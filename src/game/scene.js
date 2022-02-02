@@ -19,8 +19,8 @@ export default class Scene {
   }
 
   renderObjects (gameObjects) {
-    console.log('render objects')
-    console.log(gameObjects)
+    // console.log('render objects')
+    // console.log(gameObjects)
     if (!!gameObjects && gameObjects.length > 0) {
       for (const gameObject of gameObjects) {
         this.scene.add(toRaw(gameObject))
@@ -29,7 +29,6 @@ export default class Scene {
   }
 
   update () {
-    console.log('update scene')
     this.renderObjects(this.gameData.getObjects)
   }
 

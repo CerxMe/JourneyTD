@@ -83,7 +83,7 @@ export default class Hex {
   }
 
   // Creates a new 3D Object to draw on the scene with the given parameters
-  draw (position, dimensions) {
+  draw (position, dimensions, color) {
     const { height, width } = dimensions
     // const { x, y, z } = position
     const hex = new THREE.Shape()
@@ -127,21 +127,9 @@ export default class Hex {
       bevelEnabled: false
     }
     const glowGeometry = new THREE.ExtrudeGeometry(hex, glowExtrudeSettings)
-    // array of colors
-    const glowColors = [
-      '#87d6ff',
-      '#8791ff',
-      '#875dbd',
-      // '#0b147c',
-      // '#040a48',
-      // '#1c2798',
-      '#5058b2',
-      '#cc8ce0',
-      '#ffa5cf'
-    ]
 
     const glowMaterial = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(glowColors[Math.floor(Math.random() * glowColors.length)]),
+      color: new THREE.Color(color),
       // wireframe: true,
       transparent: true,
       opacity: 1

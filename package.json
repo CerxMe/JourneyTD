@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "pinia": "^2.0.9",
+    "qrcode.vue": "^3.3.3",
     "seedrandom": "^3.0.5",
     "sha3": "^2.1.4",
     "three": "^0.136.0",

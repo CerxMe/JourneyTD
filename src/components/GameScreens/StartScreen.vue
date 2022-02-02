@@ -11,7 +11,7 @@ const gameData = useGameDataStore()
 </script>
 <template lang="pug">
 .hello
-  | Welcome to the game!
+  | Start a new game
   EntropyGenerator
   // start game button
   button.start-game(
@@ -19,6 +19,15 @@ const gameData = useGameDataStore()
   )
     | Go!
 </template>
-<style scoped>
-
+<style lang="stylus" scoped>
+@import '../../styles/variables.styl'
+.hello
+  opacity: 0.755
+  background color1
+  padding 1em
+  border-radius .3em
+  border solid 1px color5
+  transition: all .3s ease-in-out
+.hello:hover
+  opacity: 1
 </style>
