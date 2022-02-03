@@ -23,6 +23,8 @@ export default class Scene {
     // console.log(gameObjects)
     if (!!gameObjects && gameObjects.length > 0) {
       for (const gameObject of gameObjects) {
+        // console.log('render object')
+        // console.log(toRaw(gameObject))
         this.scene.add(toRaw(gameObject))
       }
     }
@@ -134,13 +136,17 @@ export default class Scene {
 
   createScene () {
     const scene = new THREE.Scene()
-    // scene.add(new THREE.GridHelper(50, 50))
+    const grid = new THREE.GridHelper(50, 50)
+    grid.rotation.x = Math.PI / 2
+    scene.add(grid)
     this.scene = scene
   }
 
   createCamera () {
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000)
+    // camera.position.set(10, 5, 5)
     camera.position.set(0, 0, 16)
+    camera.lookAt(new THREE.Vector3(0, 0, 0))
     // draw a box at the camera's position
     // set the camera's position to the center of the box
     // this.scene.add(box)
@@ -150,8 +156,8 @@ export default class Scene {
 
   createRenderer () {
     const renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas
-      // antialias: true
+      canvas: this.canvas,
+      antialias: true
     })
     renderer.setAnimationLoop(() => {
       renderer.render(this.scene, this.camera)

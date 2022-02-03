@@ -48,7 +48,7 @@ export const useGameDataStore = defineStore({
         // console.log('hex', hex) // hex
         const position = hex.center
         //  draw (position, size, color, offset)
-        const dimensions = { width: 0.88, height: 0.22 }
+        const dimensions = { width: 0.95, height: 0.2 }
         const colors = ['#53437f',
           '#a89fcc',
           '#ffffff',
@@ -69,8 +69,13 @@ export const useGameDataStore = defineStore({
         // console.log(rng)
         const color = colors[Math.floor(rng * colors.length)]
         // console.log('color', color)
-        const mesh = hex.draw(position, dimensions, color) // get the mesh and add it to the scene
-        objects.push(mesh)
+        hex.color = color
+        hex.slopeRatio = 0.88
+        // get the mesh and add it to the scene
+        const mesh = hex.draw(position, dimensions)
+        if (mesh) {
+          objects.push(mesh)
+        }
       }
       this.objects = objects
     },

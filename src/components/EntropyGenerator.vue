@@ -57,6 +57,8 @@ class EntropyGenerator {
 }
 
 const generator = new EntropyGenerator(1000)
+generator.generate() // generate initial entropy (on render)
+
 function resumeGenerator () {
   if (seedInput.value === null || seedInput.value === '') {
     generator.start()

@@ -4,16 +4,21 @@ import { routes } from './routes.js'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
-const app = createApp(App)
+try {
+  const app = createApp(App)
 
-// Use store
-app.use(createPinia())
+  // Use store
+  app.use(createPinia())
 
-// Use router
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
-app.use(router)
+  // Use router
+  const router = createRouter({
+    history: createWebHistory(),
+    routes
+  })
+  app.use(router)
 
-app.mount('#app')
+  app.mount('#app')
+} catch (error) {
+  console.error('error')
+  console.error(error)
+}
