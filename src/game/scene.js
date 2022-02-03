@@ -139,14 +139,36 @@ export default class Scene {
     const grid = new THREE.GridHelper(50, 50)
     grid.rotation.x = Math.PI / 2
     scene.add(grid)
+
+    const light = new THREE.DirectionalLight(0xffffff)
+    light.position.set(0, 0, 1)
+    scene.add(light)
+
     this.scene = scene
   }
 
   createCamera () {
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000)
+    // const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000)
     // camera.position.set(10, 5, 5)
-    camera.position.set(0, 0, 16)
+
+    // convert perspective camera to orthographic
+    const scale = 1
+
+    const browserWidth = window.innerWidth
+    const browserHeight = window.innerHeight
+    const aspect = browserWidth / browserHeight
+    const camera = new THREE.OrthographicCamera(
+      -scale * aspect,
+      scale * aspect,
+      scale,
+      -scale,
+      1,
+      1000
+    )
+    camera.position.set(0, 0, 10)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
+    camera.updateProjectionMatrix()
+
     // draw a box at the camera's position
     // set the camera's position to the center of the box
     // this.scene.add(box)

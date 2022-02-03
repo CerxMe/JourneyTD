@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 // import OrbitControls
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js'
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
+import { VertexTangentsHelper } from 'three/examples/jsm/helpers/VertexTangentsHelper.js'
 
 // Represents a single hexagon object in the game
 export default class Hex {
@@ -47,17 +49,27 @@ export default class Hex {
   }
 
   // Returns and array of the 6 points of the hexagon in clockwise order starting from the top left corner
-  getCorners () {
+  getHexCorners (radius, zplane) {
     const corners = []
-    for (let i = 0; i <= 6; i++) {
+
+    const hex = new THREE.Shape()
+    // make the hexagon's center at the point
+    hex.moveTo(0, 0)
+    // draw shape
+    for (let i = 0; i < 7; i++) {
       const angle = i * Math.PI / 3
-      const x = this.cube.x + Math.cos(angle) * this.size
-      const y = this.cube.y + Math.sin(angle) * this.size
-      const z = this.cube.z
-      const corner = new THREE.Vector3(x, y, z)
-      corners.push(corner)
+      if (i === 0) {
+        hex.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
+      } else {
+        hex.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
+      }
     }
-    return corners
+
+    const vertices = hex.getPoints().map(point => (
+      new THREE.Vector3(point.x, point.y, zplane)
+    ))
+
+    return vertices
   }
 
   // Returns an array of the 6 sides of the hexagon in clockwise order starting from the top left corner
@@ -89,78 +101,103 @@ export default class Hex {
     const { height, width } = dimensions
     // const { x, y, z } = position
     const slopeRatio = this.slopeRatio
+
     // bottom face shape
-    const hex = new THREE.Shape()
-    // make the hexagon's center at the point
-    hex.moveTo(0, 0)
-    // draw shape
-    for (let i = 0; i < 7; i++) {
-      const radius = width
-      const angle = i * Math.PI / 3
-      if (i === 0) {
-        hex.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-      } else {
-        hex.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-      }
-    }
+    const bottomFaceVertices = this.getHexCorners(width, 0)
 
-    // top face shape
-    const hex2 = new THREE.Shape()
     // top of the hexagon with a smaller radius
-    hex2.moveTo(0, height)
-    for (let i = 0; i < 7; i++) {
-      // expects the ratio to be a number between 0 and 1
-      const radius = width * slopeRatio * -1
-      const angle = i * Math.PI / 3
-      if (i === 0) {
-        hex2.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-      } else {
-        hex2.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-      }
-    }
-
-    // get hex vertices
-    const vertices = hex.getPoints().map(point => (
-      new THREE.Vector3(point.x, point.y, 0)
-    ))
-    const vertices2 = hex2.getPoints().map(point => (
-      new THREE.Vector3(point.x, point.y, height)
-    ))
+    const topFaceVertices = this.getHexCorners(width * slopeRatio * -1, height)
 
     // combine bottom and top faces into one shape to create the hexagon generated shape
     const points = [
-      ...vertices,
-      ...vertices2
+      ...topFaceVertices,
+      ...bottomFaceVertices
     ]
 
+    // convert points to hull
     const geometry = new ConvexGeometry(points)
 
-    // use vertex colors to set the color of the top and bottom faces
+    // const material =
+    //   // new THREE.MeshNormalMaterial({
+    //   //   // flatShading: true,
+    //   //   side: THREE.FrontSide
+    //   //   // vertexColors: true
+    //   // })
+    //   new THREE.MeshNormalMaterial({
+    //     // flatShading: true,
+    //     side: THREE.FrontSide,
+    //     vertexColors: true
+    //   })
 
-    // const colors = []
-    //
-    // const material = new THREE.MeshBasicMaterial({ vertexColors: true })
-    // const primaryColor = new THREE.Color(0xffffff)
-    // const secondaryColor = this.color
-    //
-    // for (let i = 0; i < hex2.getPoints(); i++) {
-    //   colors.push(primaryColor)
-    // }
-    //
-    // geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+    /* COLOR FACES */
+    geometry.computeVertexNormals()
+
+    const count = geometry.attributes.position.count
+    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3))
+    const color = new THREE.Color()
+    const colors = geometry.attributes.color
+
+    const z = geometry.attributes.position.getZ(0)
+    let min = z; let max = z
+    for (let i = 0; i < count; i++) {
+      const z = geometry.attributes.position.getZ(i)
+      if (z < min) {
+        min = z
+      }
+      if (z > max) {
+        max = z
+      }
+    }
+    const steepness = 0.75
+    const aa = Math.abs(max - min) + steepness
+    for (let i = 0; i < count; i++) {
+      const pos = geometry.attributes.position.getZ(i)
+      if (pos / aa >= max) {
+        colors.setXYZ(i, 0, 0, 0)
+      } else {
+        const val = (pos + steepness) / aa
+        colors.setXYZ(i, val, val, val)
+      }
+    }
+    console.log(colors)
+
+    /* FINAL OBJECT */
 
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
-      wireframe: true
+      flatShading: true,
+      vertexColors: true,
+      shininess: 0
     })
 
+    // const material =
+    //   // new THREE.MeshNormalMaterial({
+    //   //   // flatShading: true,
+    //   //   side: THREE.FrontSide
+    //   //   // vertexColors: true
+    //   // })
+    // new THREE.MeshNormalMaterial({
+    //   // flatShading: true,
+    //   side: THREE.FrontSide,
+    //   vertexColors: true
+    // })
     const mesh = new THREE.Mesh(geometry, material)
+    console.log(
+      mesh.material)
+
     mesh.position.set(position.x, position.y, position.z)
     // // ?connect the hexagon's top sides to the bottom
     // const hexagon = new THREE.Object3D()
     // hexagon.add(mesh)
 
-    this.object = mesh
+    // const helper = new VertexNormalsHelper(mesh, 0.5, 0x00ff00)
+
+    // combine helper and mesh into one object
+    const hexagon = new THREE.Object3D()
+    hexagon.add(mesh)
+    // hexagon.add(helper)
+
+    this.object = hexagon
   }
 
   // Creates a new 3D Object to draw on the scene with the given parameters
