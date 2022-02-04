@@ -2,17 +2,18 @@
 // Initializes a button for selecting the game seed value
 import { useGameDataStore } from '../store/gameData'
 import { ref, onMounted, onUnmounted } from 'vue'
+const emit = defineEmits(['inputFocused', 'inputBlurred', 'submitSeed'])
 
 const gameData = useGameDataStore()
 
 const seedInput = ref(null)
+const inputElement = ref(null)
 
 // generates random values to seed the game
 class EntropyGenerator {
   constructor (interval) {
     this.interval = interval
-    this.generator = null
-    this.lastEntropy = null
+    this.generator = true
   }
 
   // start the entropy generator with the given interval
@@ -60,11 +61,29 @@ const generator = new EntropyGenerator(1000)
 generator.generate() // generate initial entropy (on render)
 
 function resumeGenerator () {
+  console.log('resuming entropy generator')
   if (seedInput.value === null || seedInput.value === '') {
     generator.start()
   }
 }
 
+// User input
+function inputFocused () {
+  generator.stop()
+  emit('inputFocused')
+}
+
+function inputBlurred () {
+  emit('inputBlurred')
+  resumeGenerator()
+}
+
+function submitSeed () {
+  emit('submitSeed')
+  generator.stop()
+}
+
+// Random generator
 onMounted(() => {
   generator.start()
 })
@@ -79,29 +98,30 @@ onUnmounted(() => {
 aside
   main
     //input(type="range", min="0", max="5000", value="1000" step="100", @change="generator.updateInterval($event.target.value)")
-    p
+    p(v-if="gameData.$state.seedHash")
       span.bold(v-if='generator.generator')
         | Random Entropy
       span.italic(v-if='!generator.generator')
-        | User Input
+        | Custom Seed
 
     input(type="text" v-model="seedInput" @input="gameData.setEntropy(seedInput)"
-      @focus="generator.stop()"
-      @blur="resumeGenerator()"
+      @focus="inputFocused" @blur="inputBlurred"
+      @submit="submitSeed"
       placeholder="Enter a seed value"
+      ref="inputElement"
   )
-  footer
+  footer(@click="inputElement.focus()")
     // draw a shaded pixel for each bit of entropy
     .entropy
     .hash {{ gameData.$state.seedHash }}
 
      // display the seed hash in the footer
-    .entropySettings(v-if="displayEntropySettings")
-      | Click to generate new entropy
-      button(
-        @click="shuffleEntropy"
-      )
-        | Shuffle
+    //.entropySettings(v-if="displayEntropySettings")
+    //  | Click to generate new entropy
+    //  button(
+    //    @click="shuffleEntropy"
+    //  )
+    //    | Shuffle
 </template>
 
 <style lang="stylus" scoped>
@@ -119,6 +139,16 @@ main
   input
     transition: all 0.5s ease-in-out
     flex-grow: 1
+    font-size: .8em;
+    color color4
+    border none
+    &::placeholder {
+      font-size: .75em;
+      color color5
+    }
+    &:focus
+      outline: none
+      border 1px solid color3
 .entropy
   display flex
   flex-direction row
@@ -142,7 +172,7 @@ aside
   padding: 0.3em
   border-radius: 0.3em
   background-color: #fff
-  cursor: pointer
+  cursor: cursor
   display flex
   flex-direction column
   footer

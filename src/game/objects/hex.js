@@ -16,9 +16,9 @@ export default class Hex {
     this.slopeRatio = 0
     this.axial = axial
     this.size = size
+    this.claimed = false
     this.sides = this.getSides()
     this.center = this.getCenter()
-    console.log('hex created')
     this.object = null
     // Hex's properties for the game
     this.properties = {
@@ -148,27 +148,48 @@ export default class Hex {
         max = z
       }
     }
+
     const steepness = 0.75
-    const aa = Math.abs(max - min) + steepness
+    const range = Math.abs(max - min) + steepness
     for (let i = 0; i < count; i++) {
       const pos = geometry.attributes.position.getZ(i)
-      if (pos / aa >= max) {
-        colors.setXYZ(i, 0, 0, 0)
+      const val = (pos + steepness) / range
+
+      if (pos / range >= max) {
+        colors.setXYZ(i, 1, 1, 1)
       } else {
-        const val = (pos + steepness) / aa
         colors.setXYZ(i, val, val, val)
       }
     }
-    console.log(colors)
 
     /* FINAL OBJECT */
 
-    const material = new THREE.MeshBasicMaterial({
+    // const material = new THREE.MeshPhongMaterial({
+    //   color: this.color,
+    //   emissive: 0x000000,
+    //   specular: 0xffffff,
+    //   vertexColors: true,
+    //   flatShading: true,
+    //   shininess: 5.55
+    // })
+
+    const claimedMaterial = new THREE.MeshPhongMaterial({
       color: this.color,
-      flatShading: true,
+      specular: 0x000000,
       vertexColors: true,
-      shininess: 0
+      flatShading: true,
+      side: THREE.FrontSide,
+      shininess: 5.55
     })
+
+    const unclaimedMaterial = new THREE.MeshBasicMaterial({
+      // flatShading: true,
+      color: this.color,
+      side: THREE.FrontSide,
+      vertexColors: true
+    })
+
+    const material = this.claimed ? unclaimedMaterial : claimedMaterial
 
     // const material =
     //   // new THREE.MeshNormalMaterial({
@@ -182,21 +203,10 @@ export default class Hex {
     //   vertexColors: true
     // })
     const mesh = new THREE.Mesh(geometry, material)
-    console.log(
-      mesh.material)
-
     mesh.position.set(position.x, position.y, position.z)
-    // // ?connect the hexagon's top sides to the bottom
-    // const hexagon = new THREE.Object3D()
-    // hexagon.add(mesh)
 
-    // const helper = new VertexNormalsHelper(mesh, 0.5, 0x00ff00)
-
-    // combine helper and mesh into one object
     const hexagon = new THREE.Object3D()
     hexagon.add(mesh)
-    // hexagon.add(helper)
-
     this.object = hexagon
   }
 

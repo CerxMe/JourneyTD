@@ -12,11 +12,16 @@ export const useGameDataStore = defineStore({
     rng: null,
     tiles: null,
     gameState: 'startScreen',
-    objects: null
+    objects: null, // THREE.Object3D array of all objects in the scene
+    player: null // Hex object of the player's current tile position
   }),
   actions: {
     startGame () {
       this.gameState = 'game'
+      console.log('game started with seed:', this.seedHash)
+
+      // TODO: Unlock player movement
+      // Start raycaster
     },
     generateTiles () {
       const initialViewDistance = 3 // initial view distance
@@ -44,14 +49,15 @@ export const useGameDataStore = defineStore({
       const gameMap = new HexGrid(initialViewDistance, hexSize)
       const hexMap = gameMap.map
       const objects = []
+      let first = false
       for (const hex of hexMap) {
+        const x = hex.x
         // console.log('hex', hex) // hex
         const position = hex.center
         //  draw (position, size, color, offset)
-        const dimensions = { width: 0.95, height: 0.2 }
+        const dimensions = { width: 0.99, height: 0.35 }
         const colors = ['#53437f',
           '#a89fcc',
-          '#ffffff',
           '#ffd9e8',
           '#ff9bb6',
           '#9968e2',
@@ -69,8 +75,19 @@ export const useGameDataStore = defineStore({
         // console.log(rng)
         const color = colors[Math.floor(rng * colors.length)]
         // console.log('color', color)
-        hex.color = color
-        hex.slopeRatio = 0.88
+        if (color) {
+          hex.color = color
+        }
+        hex.slopeRatio = 0.75
+
+        if (!first) {
+          first = true
+          hex.claimed = true
+          this.player = hex
+          hex.color = '#ffffff'
+          hex.slopeRatio = 0.88
+        }
+
         // get the mesh and add it to the scene
         const mesh = hex.draw(position, dimensions)
         if (mesh) {
@@ -82,7 +99,6 @@ export const useGameDataStore = defineStore({
 
     // The entropy is a string of random parameters generated from user's inputs
     setEntropy (entropy) {
-      console.log('entropy', entropy)
       // hashes the entropy and sets the seed
       hash.update(entropy.toString() || '')
       this.seedHash = hash.digest('hex')

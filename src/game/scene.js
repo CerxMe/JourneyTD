@@ -136,12 +136,13 @@ export default class Scene {
 
   createScene () {
     const scene = new THREE.Scene()
-    const grid = new THREE.GridHelper(50, 50)
-    grid.rotation.x = Math.PI / 2
-    scene.add(grid)
+
+    // const grid = new THREE.GridHelper(2048, 1024)
+    // grid.rotation.x = Math.PI / 2
+    // scene.add(grid)
 
     const light = new THREE.DirectionalLight(0xffffff)
-    light.position.set(0, 0, 1)
+    light.position.set(0, 0, 10)
     scene.add(light)
 
     this.scene = scene
@@ -152,11 +153,12 @@ export default class Scene {
     // camera.position.set(10, 5, 5)
 
     // convert perspective camera to orthographic
-    const scale = 1
+    const scale = 9
 
     const browserWidth = window.innerWidth
     const browserHeight = window.innerHeight
     const aspect = browserWidth / browserHeight
+
     const camera = new THREE.OrthographicCamera(
       -scale * aspect,
       scale * aspect,

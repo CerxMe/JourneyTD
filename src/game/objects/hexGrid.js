@@ -36,11 +36,6 @@ export default class HexGrid {
 
   // The cube coordinates are the simplest. They're the coordinates of the center of the hexagon.
   createMap () {
-    console.log('generating hex map')
-    // create a 2d map of hexagons
-    console.log('map size: ', this.mapSize)
-    console.log('hex size: ', this.hexSize)
-
     // generate a hexagonal grid
     const pts = []
     // center hex
