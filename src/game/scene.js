@@ -5,6 +5,9 @@ export default class Scene {
   constructor (canvas, gameData) {
     this.canvas = canvas
     this.gameData = gameData
+    this.raycaster = new THREE.Raycaster()
+    this.scale = 9
+    this.pointer = { x: 0, y: 0 }
     this.setup()
   }
 
@@ -18,20 +21,66 @@ export default class Scene {
     this.gameLoop()
   }
 
-  renderObjects (gameObjects) {
-    // console.log('render objects')
-    // console.log(gameObjects)
+  renderGameObjects (gameObjects) {
+    // render the game objects
     if (!!gameObjects && gameObjects.length > 0) {
+      const scene = this.scene
+      const sceneObjects = scene.children.filter(child => child.name === 'hex')
+
+      // compile objects to render
+      const objectsToRender = []
       for (const gameObject of gameObjects) {
-        // console.log('render object')
-        // console.log(toRaw(gameObject))
-        this.scene.add(toRaw(gameObject))
+        const mesh = toRaw(gameObject.object)
+        if (mesh.name === 'hex') {
+          objectsToRender.push(mesh)
+        }
       }
+
+      // remove obselote objects from the scene
+      for (const sceneObject of sceneObjects) {
+        const exists = objectsToRender.find(object => object.uuid === sceneObject.uuid)
+        if (!exists) {
+          scene.remove(sceneObject)
+        } else { // update the object
+          objectsToRender.splice(objectsToRender.indexOf(sceneObject), 1)
+        }
+      }
+
+      // add new objects to the scene
+      for (const object of objectsToRender) {
+        scene.add(object)
+      }
+      this.scene = scene
     }
   }
 
+  onPointerMove (event) {
+    this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+    this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+  }
+
+  onWindowResize () {
+    console.log('resize')
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.createCamera()
+  }
+
   update () {
-    this.renderObjects(this.gameData.getObjects)
+    // find intersections
+    this.raycaster.setFromCamera(this.pointer, this.camera)
+
+    const hexTiles = this.scene.children.filter(child => child.name === 'hex')
+    const intersects = this.raycaster.intersectObjects(hexTiles)
+
+    if (intersects.length > 0) {
+      // console.log(intersects)
+      // console.log(intersects[0].object.name)
+      this.gameData.setSelectedObject(intersects)
+    } else {
+      this.gameData.setSelectedObject(null)
+    }
+
+    this.renderGameObjects(this.gameData.getObjects)
   }
 
   gameLoop () {
@@ -153,7 +202,7 @@ export default class Scene {
     // camera.position.set(10, 5, 5)
 
     // convert perspective camera to orthographic
-    const scale = 9
+    const scale = this.scale
 
     const browserWidth = window.innerWidth
     const browserHeight = window.innerHeight
@@ -186,6 +235,12 @@ export default class Scene {
     renderer.setAnimationLoop(() => {
       renderer.render(this.scene, this.camera)
     })
+
+    this.updateRenderer(renderer) // set the size of the renderer
+  }
+
+  updateRenderer (renderer) {
+    renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer = renderer
   }

@@ -206,6 +206,7 @@ export default class Hex {
     mesh.position.set(position.x, position.y, position.z)
 
     const hexagon = new THREE.Object3D()
+    hexagon.name = 'hex'
     hexagon.add(mesh)
     this.object = hexagon
   }
@@ -213,7 +214,6 @@ export default class Hex {
   // Creates a new 3D Object to draw on the scene with the given parameters
   draw (position, dimensions) {
     this.updateHexObject(position, dimensions)
-    return this.object
   }
 
   // outdated code

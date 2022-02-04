@@ -12,8 +12,9 @@ export const useGameDataStore = defineStore({
     rng: null,
     tiles: null,
     gameState: 'startScreen',
-    objects: null, // THREE.Object3D array of all objects in the scene
-    player: null // Hex object of the player's current tile position
+    gameObjects: null, // THREE.Object3D array of all objects in the scene
+    player: null, // Hex object of the player's current tile position
+    selectedObject: null // Hex object of the selected object
   }),
   actions: {
     startGame () {
@@ -89,12 +90,10 @@ export const useGameDataStore = defineStore({
         }
 
         // get the mesh and add it to the scene
-        const mesh = hex.draw(position, dimensions)
-        if (mesh) {
-          objects.push(mesh)
-        }
+        hex.draw(position, dimensions)
+        objects.push(hex)
       }
-      this.objects = objects
+      this.gameObjects = objects
     },
 
     // The entropy is a string of random parameters generated from user's inputs
@@ -113,11 +112,14 @@ export const useGameDataStore = defineStore({
         const random = this.rng()
         return random
       }
+    },
+    setSelectedObject (object) {
+      this.selectedObject = object
     }
   },
   getters: {
     getObjects () {
-      return this.objects
+      return this.gameObjects
     }
   }
 })

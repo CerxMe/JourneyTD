@@ -18,8 +18,8 @@ function startGame (event) {
   if ((startButtonHovered.value && event === 'click') || event === 'submit') {
     gameData.startGame()
   } else if (!startButtonHovered.value && event) {
-    event.preventDefault()
     gameData.startGame()
+    event.preventDefault()
   }
 }
 

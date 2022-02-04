@@ -6,10 +6,20 @@ import { useGameDataStore } from '../store/gameData'
 const gameData = useGameDataStore()
 const root = ref(null)
 
+const scene = ref(null)
+
 onMounted(() => {
   // the DOM element will be assigned to the ref after initial render
-  const scene = new Scene(root.value, gameData)
+  scene.value = new Scene(root.value, gameData)
+  document.addEventListener('pointermove', updateScene)
+  window.addEventListener('resize', resize)
 })
+function updateScene (e) {
+  scene.value.onPointerMove(e)
+}
+function resize (e) {
+  scene.value.onWindowResize(e)
+}
 
 </script>
 
