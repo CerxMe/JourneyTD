@@ -7,10 +7,10 @@ import { ref } from 'vue'
 import GameCanvas from '~/components/GameCanvas.vue'
 import StartScreen from '~/components/GameScreens/StartScreen.vue'
 import EndScreen from '~/components/GameScreens/EndScreen.vue'
+import ScaleSettings from '~/components/ScaleSettings.vue'
 
 const gameData = useGameDataStore()
 console.log('GAME DATA', gameData.seed)
-gameData.generateTiles()
 </script>
 
 <template lang="pug">
@@ -21,6 +21,8 @@ gameData.generateTiles()
   .foreground
     StartScreen(v-if="gameData.gameState === 'startScreen'" )
     EndScreen(v-if="gameData.gameState === 'endScreen'" )
+    .game(v-if="gameData.gameState === 'game'")
+      ScaleSettings
 
 </template>
 

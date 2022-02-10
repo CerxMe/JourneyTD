@@ -109,6 +109,7 @@ aside
       @submit="submitSeed"
       placeholder="Enter a seed value"
       ref="inputElement"
+      spellcheck="false"
   )
   footer(@click="inputElement.focus()")
     // draw a shaded pixel for each bit of entropy

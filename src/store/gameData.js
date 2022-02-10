@@ -3,11 +3,19 @@ import HexGrid from '../game/objects/hexGrid'
 import * as Seedrandom from 'seedrandom'
 import { ref } from 'vue'
 import { SHA3 } from 'sha3'
+import * as THREE from 'three'
 const hash = new SHA3(512)
 
 export const useGameDataStore = defineStore({
   id: 'gameData',
   state: () => ({
+    scene: {
+      camera: {
+        position: new THREE.Vector3(0, 0, 16),
+        lookAt: new THREE.Vector3(0, 0, 0)
+      },
+      scale: 1.5
+    },
     seedHash: null,
     rng: null,
     tiles: null,
@@ -22,78 +30,58 @@ export const useGameDataStore = defineStore({
       console.log('game started with seed:', this.seedHash)
 
       // TODO: Unlock player movement
-      // Start raycaster
+      // this.player.position = new THREE.Vector3(0, 0, 0)
     },
+
+    // Prepares starting tiles
     generateTiles () {
       const initialViewDistance = 3 // initial view distance
-      const hexSize = 1
-
-      /*
-      Generates a hashtable for cube projection of hex coordinates
-      Horizontal lines have constant "y" coordinate. Diagonal lines have constant "x" and "z" coordinates. Neighboring cells differ by 1 in two coordinates.
-
-      Distance: max(|dx|,|dy|,|dz|)
-      Storage: wtf
-      Neighbors: (1,0,-1); (-1,0,1); (0,1,-1); (0,-1,1); (1,-1,0); (-1,1,0)
-      Straight lines: (x ± n, y, z ∓ n); (x ± n, y ∓ n, z); (x, y ± n, z ∓ n)
-      Remarks: x+y+z = 0; x, y, z ∈ ℕ
-      */
-
-      // console.log('RNG')
-      // for (let j = 0; j < mapsize; j++) {
-      //   const random = getRng()
-      //   console.log()
-      // }
-
-      // renders backround hexagon grid
-      console.log('generating hexes')
-      const gameMap = new HexGrid(initialViewDistance, hexSize)
-      const hexMap = gameMap.map
+      const gridCenter = new THREE.Vector3(0, 0, 0)
+      const grid = new HexGrid(gridCenter)
+      grid.createMap(initialViewDistance)
+      const hexMap = grid.populatedHexes
       const objects = []
-      let first = false
       for (const hex of hexMap) {
-        const x = hex.x
-        // console.log('hex', hex) // hex
-        const position = hex.center
-        //  draw (position, size, color, offset)
-        const dimensions = { width: 0.99, height: 0.35 }
-        const colors = ['#53437f',
-          '#a89fcc',
-          '#ffd9e8',
-          '#ff9bb6',
-          '#9968e2',
-          '#be9bff',
-          '#7fceff',
-          '#6d81ff',
-          '#2c6f99',
-          '#00bcaa',
-          '#c48f9e',
-          '#8e586f',
-          '#ff5470',
-          '#ff9b71',
-          '#ffd9ae']
-        const rng = this.getRng()
-        // console.log(rng)
-        const color = colors[Math.floor(rng * colors.length)]
-        // console.log('color', color)
-        if (color) {
-          hex.color = color
-        }
-        hex.slopeRatio = 0.75
-
-        if (!first) {
-          first = true
-          hex.claimed = true
-          this.player = hex
-          hex.color = '#ffffff'
-          hex.slopeRatio = 0.88
-        }
-
-        // get the mesh and add it to the scene
-        hex.draw(position, dimensions)
+        this.generateHex(hex)
         objects.push(hex)
       }
       this.gameObjects = objects
+    },
+
+    // Generates a hex tile from rng
+    generateHex (hex) {
+      hex.dimensions = { width: 1, height: 0.35 }
+      hex.slopeRatio = 0.75
+
+      // TODO: support multiple random properties from seed
+      const colors = [
+        '#53437f',
+        '#a89fcc',
+        '#ffd9e8',
+        '#ff9bb6',
+        '#9968e2',
+        '#be9bff',
+        '#7fceff',
+        '#6d81ff',
+        '#2c6f99',
+        '#00bcaa',
+        '#c48f9e',
+        '#8e586f',
+        '#ff5470',
+        '#ff9b71',
+        '#ffd9ae'
+      ]
+      const rng = this.getRng()
+      // console.log(rng)
+      const color = colors[Math.floor(rng * colors.length)]
+      // console.log('color', color)
+      if (color) {
+        hex.color = color
+      }
+
+      // sets the hex with updated values
+      hex.updateHexObject()
+      return hex
     },
 
     // The entropy is a string of random parameters generated from user's inputs

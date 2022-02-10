@@ -1,25 +1,31 @@
 <script setup>
 // Renders the game canvas.
 import Scene from '../game/scene.js'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useGameDataStore } from '../store/gameData'
 const gameData = useGameDataStore()
 const root = ref(null)
 
-const scene = ref(null)
+let scene = null
 
 onMounted(() => {
   // the DOM element will be assigned to the ref after initial render
-  scene.value = new Scene(root.value, gameData)
+  scene = new Scene(root.value, gameData)
   document.addEventListener('pointermove', updateScene)
   window.addEventListener('resize', resize)
 })
 function updateScene (e) {
-  scene.value.onPointerMove(e)
+  scene.onPointerMove(e)
 }
 function resize (e) {
-  scene.value.onWindowResize(e)
+  scene.onWindowResize(e)
 }
+onUnmounted(() => {
+  console.log('deactivated')
+  scene.destroy()
+  document.removeEventListener('pointermove', updateScene)
+  window.removeEventListener('resize', resize)
+})
 
 </script>
 

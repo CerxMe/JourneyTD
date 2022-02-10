@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { toRaw } from '@vue/reactivity'
+
 export default class Scene {
   // initiates with the canvas element and the renderers the scene
   constructor (canvas, gameData) {
@@ -7,7 +8,9 @@ export default class Scene {
     this.gameData = gameData
     this.raycaster = new THREE.Raycaster()
     this.scale = 9
-    this.pointer = { x: 0, y: 0 }
+    this.pointer = { x: -9999, y: -9999 } // set to -9999 to prevent registering pointer before mousemove
+    this.highlightSprite = new THREE.TextureLoader().load('../../assets/hex_highlight.svg')
+
     this.setup()
   }
 
@@ -30,7 +33,7 @@ export default class Scene {
       // compile objects to render
       const objectsToRender = []
       for (const gameObject of gameObjects) {
-        const mesh = toRaw(gameObject.object)
+        const mesh = toRaw(gameObject.mesh)
         if (mesh.name === 'hex') {
           objectsToRender.push(mesh)
         }
@@ -66,21 +69,61 @@ export default class Scene {
   }
 
   update () {
-    // find intersections
-    this.raycaster.setFromCamera(this.pointer, this.camera)
-
-    const hexTiles = this.scene.children.filter(child => child.name === 'hex')
-    const intersects = this.raycaster.intersectObjects(hexTiles)
-
-    if (intersects.length > 0) {
-      // console.log(intersects)
-      // console.log(intersects[0].object.name)
-      this.gameData.setSelectedObject(intersects)
-    } else {
-      this.gameData.setSelectedObject(null)
-    }
-
+    // console.log('update')
     this.renderGameObjects(this.gameData.getObjects)
+
+    // find intersections
+    if (this.gameData.gameState === 'game') {
+      this.raycaster.setFromCamera(this.pointer, this.camera)
+
+      const hexTiles = this.scene.children.filter(child => child.name === 'hex')
+      const intersects = this.gameData.scene.scale < 10 ? this.raycaster.intersectObjects(hexTiles) : []
+
+      if (intersects.length > 0) {
+      // console.log(intersects)
+        this.gameData.setSelectedObject(intersects[0].object.uuid)
+      } else if (this.gameData.selectedObject) {
+        this.gameData.setSelectedObject(null)
+      }
+
+      if ((this.lastSelectedObject && this.gameData.selectedObject !== this.lastSelectedObject) || !this.gameData.selectedObject) {
+      // remove highlight
+        const highlight = this.scene.getObjectByProperty('name', 'highlight')
+        if (highlight) {
+          this.scene.remove(highlight)
+        }
+      }
+      if (this.gameData.selectedObject) {
+        const selectedObject = this.scene.getObjectByProperty('uuid', this.gameData.selectedObject)
+        if (selectedObject && selectedObject.uuid !== this.lastSelectedObject) {
+          const highlight = new THREE.PointsMaterial({
+          // color: 0xff00ff,
+            color: 0x000000,
+            alphaMap: this.highlightSprite,
+            alphaTest: 0.5,
+            transparent: true,
+            // size: 6.66
+            size: 16
+          })
+          // highlight.color.setHSL(1.0, 0.3, 0.7)
+
+          const sphere = new THREE.Points(selectedObject.geometry, highlight)
+          sphere.position.copy(selectedObject.position)
+          sphere.name = 'highlight'
+          this.scene.add(sphere)
+        }
+        this.lastSelectedObject = this.gameData.selectedObject
+      }
+    }
+    // TODO: avoid updating this every frame
+    this.updateCamera()
+  }
+
+  destroy () {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame)
+    }
+    this.renderer.dispose()
   }
 
   gameLoop () {
@@ -89,7 +132,7 @@ export default class Scene {
     // render the scene
     this.renderer.render(this.scene, this.camera)
     // request the next frame
-    requestAnimationFrame(() => {
+    this.animationFrame = requestAnimationFrame(() => {
       this.gameLoop()
     })
   }
@@ -109,80 +152,6 @@ export default class Scene {
     // TODO: get the camera frustum points and check if they are intersecting with the hexagon grid
   }
 
-  createMap () {
-    // generate a hexagonal grid
-    const pts = []
-    // center hex
-    pts.push(new THREE.Vector3())
-    // outside rings
-    const unit = Math.sqrt(3)
-    const angle = Math.PI / 3
-    const axis = new THREE.Vector3(0, 0, 1)
-    const axisVector = new THREE.Vector3(0, -unit, 0)
-    const sideVector = new THREE.Vector3(0, unit, 0).applyAxisAngle(axis, -angle)
-    // number of rings from the center
-    const circleCount = 1
-    const tempV3 = new THREE.Vector3()
-    for (let seg = 0; seg < 6; seg++) {
-      for (let ax = 1; ax <= circleCount; ax++) {
-        for (let sd = 0; sd < ax; sd++) {
-          tempV3.copy(axisVector)
-            .multiplyScalar(ax)
-            .addScaledVector(sideVector, sd)
-            .applyAxisAngle(axis, angle * seg)
-          pts.push(new THREE.Vector3().copy(tempV3))
-        }
-      }
-    }
-    console.log(pts)
-    this.map = pts
-  }
-
-  // drawHexes () {
-  //   // set color
-  //   const color = new THREE.Color('#ffffff')
-  //   const color2 = new THREE.Color('#ff00ff')
-  //   // render a hexagon in center each grid cell
-  //   for (const point of this.map) {
-  //     this.drawHex(point, 1, color, -0.1)
-  //     // const randomsize = Math.random() * 0.3 + 0.5 // 0.7 - 0.8
-  //     this.drawHex(point, 0.95, color2)
-  //   }
-  // }
-  //
-  // drawHex (position, size, color, offset) {
-  //   const hex = new THREE.Shape()
-  //   // make the hexagon's center at the point
-  //   hex.moveTo(0, 0)
-  //   // draw the hexagon
-  //   for (let i = 0; i < 7; i++) {
-  //     const radius = size
-  //     const angle = i * Math.PI / 3
-  //     if (i === 0) {
-  //       hex.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-  //     } else {
-  //       hex.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-  //     }
-  //   }
-  //   // create a geometry from the hexagon shape
-  //   // extrude the shape into a 3D object
-  //   const extrudeSettings = {
-  //     steps: 1,
-  //     depth: size,
-  //     bevelEnabled: false
-  //   }
-  //   const geometry = new THREE.ExtrudeGeometry(hex, extrudeSettings)
-  //   // create a mesh from the geometry
-  //   const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color }))
-  //   // set the mesh's position
-  //   mesh.position.copy(position)
-  //   if (offset) {
-  //     mesh.position.z += offset
-  //   }
-  //   // add the mesh to the scene
-  //   this.scene.add(mesh)
-  // }
-
   createScene () {
     const scene = new THREE.Scene()
 
@@ -201,9 +170,7 @@ export default class Scene {
     // const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000)
     // camera.position.set(10, 5, 5)
 
-    // convert perspective camera to orthographic
     const scale = this.scale
-
     const browserWidth = window.innerWidth
     const browserHeight = window.innerHeight
     const aspect = browserWidth / browserHeight
@@ -219,12 +186,23 @@ export default class Scene {
     camera.position.set(0, 0, 10)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
     camera.updateProjectionMatrix()
-
-    // draw a box at the camera's position
-    // set the camera's position to the center of the box
-    // this.scene.add(box)
-    // set the camera's position to the center of the box
     this.camera = camera
+  }
+
+  updateCamera () {
+    const scale = this.gameData.scene.scale
+    console.log(scale)
+    const browserWidth = window.innerWidth
+    const browserHeight = window.innerHeight
+    const aspect = browserWidth / browserHeight
+    const cameraData = this.gameData.scene.camera
+    this.camera.lookAt(cameraData.lookAt)
+    this.camera.position.copy(cameraData.position)
+    this.camera.left = -scale * aspect
+    this.camera.right = scale * aspect
+    this.camera.top = scale
+    this.camera.bottom = -scale
+    this.camera.updateProjectionMatrix()
   }
 
   createRenderer () {
