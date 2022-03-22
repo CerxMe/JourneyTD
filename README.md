@@ -3,7 +3,7 @@ strategy "tower defense" game played on a hexagonal grid
 
 -------------------------------------
 
-live: [Netlify](https://inspiring-jepsen-1d9cc8.netlify.app)
+live: [Netlify](https://fancy-paletas-0bf3b0.netlify.app)
 
 docs: [Notion](https://incredible-cabbage-74c.notion.site/Tower-Defence-game-f7c8763a4c6440a8b93158c86e8b0663)
 | [Figma](https://www.figma.com/file/lIoQwkBZJ1cT5rzONsBlIm/I-don't-know-what-I'm-doing?node-id=0%3A1)
