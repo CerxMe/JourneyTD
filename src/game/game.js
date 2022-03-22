@@ -76,6 +76,12 @@ export class Game {
     })
   }
 
+  highlightSelectedObjects (hex) {
+    // takes the hex position and returns the highlighted object at that position
+    // the highligted object encopasses adjacent hexes and colors them differently when the selection is unavailable.
+
+  }
+
   getCanvasSize () {
     return {
       width: this.canvas.width,
