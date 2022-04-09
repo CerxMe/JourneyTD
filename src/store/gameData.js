@@ -103,6 +103,10 @@ export const useGameDataStore = defineStore({
     },
     setSelectedObject (object) {
       this.selectedObject = object
+    },
+
+    updateCamera (scene) {
+      this.scene = scene
     }
   },
   getters: {

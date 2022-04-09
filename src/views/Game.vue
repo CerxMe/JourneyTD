@@ -1,7 +1,6 @@
 <script setup>
 // This page contains all the logic for the game.
 import { useGameDataStore } from '../store/gameData'
-import { ref } from 'vue'
 
 // imported components
 import GameCanvas from '~/components/GameCanvas.vue'
@@ -15,9 +14,10 @@ console.log('GAME DATA', gameData.seed)
 
 <template lang="pug">
 .gameContainer
-  // This is the canvas that the game is rendered on on a background layer.
+  // This is the canvas that the game is rendered on.
   .background
     GameCanvas
+  // Any UI components that need to be rendered on top of the game.
   .foreground
     StartScreen(v-if="gameData.gameState === 'startScreen'" )
     EndScreen(v-if="gameData.gameState === 'endScreen'" )

@@ -3,14 +3,15 @@ import { toRaw } from '@vue/reactivity'
 
 export default class Scene {
   // initiates with the canvas element and the renderers the scene
-  constructor (canvas, gameData) {
+  constructor (canvas, getGameData = () => null) {
+    console.log(getGameData)
     this.canvas = canvas
-    this.gameData = gameData
+    this.gameData = getGameData()
     this.raycaster = new THREE.Raycaster()
     this.scale = 9
     this.pointer = { x: -9999, y: -9999 } // set to -9999 to prevent registering pointer before mousemove
     this.highlightSprite = new THREE.TextureLoader().load('../../assets/hex_highlight.svg')
-
+    this.subsription = null
     this.setup()
   }
 
@@ -20,8 +21,51 @@ export default class Scene {
     console.log('draw scene')
     this.createScene()
     this.createCamera()
+    this.updateCamera() // iherits the initial settings from the game data
     this.createRenderer()
+    this.subscribeToData()
     this.gameLoop()
+  }
+
+  subscribeToData () { // this is where I wish I had typescript
+    // Subsribe to scene updates
+    this.subsription = this.gameData.$onAction(
+      ({
+        name, // name of the action
+        store, // store instance, same as `someStore`
+        args, // array of parameters passed to the action
+        after, // hook after the action returns or resolves
+        onError // hook if the action throws or rejects
+      }) => {
+        after((result) => {
+          switch (name) {
+            case 'updateScene':
+              this.updateScene(result)
+              break
+            case 'updateCamera':
+              this.updateCamera(result)
+              break
+            case 'updateRenderer':
+              this.updateRenderer(result)
+              break
+            case 'updatePointer':
+              this.updatePointer(result)
+              break
+            case 'updateHighlight':
+              this.updateHighlight(result)
+              break
+            case 'updateScale':
+              this.updateScale(result)
+              break
+            case 'updateGameData':
+              this.updateGameData(result)
+              break
+            // default:
+            //   console.log('no action found')
+          }
+        })
+      }
+    )
   }
 
   renderGameObjects (gameObjects) {
@@ -63,7 +107,7 @@ export default class Scene {
   }
 
   onWindowResize () {
-    console.log('resize')
+    // console.log('resize')
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.createCamera()
   }
@@ -115,13 +159,15 @@ export default class Scene {
         this.lastSelectedObject = this.gameData.selectedObject
       }
     }
-    // TODO: avoid updating this every frame
-    this.updateCamera()
   }
 
   destroy () {
-    if (this.animationFrame) {
+    if (this.animationFrame) { // cancel the animation
       cancelAnimationFrame(this.animationFrame)
+    }
+    if (this.subsription) { // unsubscribe from the store
+      this.subsription()
+      this.subsription = null
     }
     this.renderer.dispose()
   }
@@ -191,7 +237,7 @@ export default class Scene {
 
   updateCamera () {
     const scale = this.gameData.scene.scale
-    console.log(scale)
+    // console.log(scale)
     const browserWidth = window.innerWidth
     const browserHeight = window.innerHeight
     const aspect = browserWidth / browserHeight

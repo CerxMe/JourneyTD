@@ -3,14 +3,14 @@
 import Scene from '../game/scene.js'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useGameDataStore } from '../store/gameData'
-const gameData = useGameDataStore()
 const root = ref(null)
-
 let scene = null
+const gameData = useGameDataStore()
+const getGameData = () => gameData
 
 onMounted(() => {
   // the DOM element will be assigned to the ref after initial render
-  scene = new Scene(root.value, gameData)
+  scene = new Scene(root.value, getGameData)
   document.addEventListener('pointermove', updateScene)
   window.addEventListener('resize', resize)
 })
@@ -36,9 +36,9 @@ canvas(
 )
 </template>
 
-<style lang="stylus">
-#scene
-  margin 0
-  height 100%
-  width 100%
+<style scoped lang="stylus">
+#container
+  box-sizing: border-box
+  height 100vh
+  width 100vw
 </style>

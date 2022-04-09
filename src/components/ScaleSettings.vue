@@ -6,15 +6,18 @@ import { onMounted, onUnmounted } from 'vue'
 const gameData = useGameDataStore()
 function increaseScale (amount) {
   const maximumScale = 45
-  gameData.scene.scale = Math.min(gameData.scene.scale + amount, maximumScale)
+  const scene = gameData.scene
+  scene.scale = Math.min(gameData.scene.scale + amount, maximumScale)
+  gameData.updateCamera(scene)
 }
 function decreaseScale (amount) {
   const minimumScale = 1
-  gameData.scene.scale = Math.max(minimumScale, gameData.scene.scale - amount)
+  const scene = gameData.scene
+  scene.scale = Math.max(minimumScale, gameData.scene.scale - amount)
+  gameData.updateCamera(scene)
 }
 
 onMounted(() => {
-  gameData.scene.scale = 6.66
   window.addEventListener('wheel', (e) => {
     if (e.deltaY > 0) {
       increaseScale(0.5)

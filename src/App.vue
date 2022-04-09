@@ -1,5 +1,7 @@
 <script setup>
 // HELLO
+// i have no idea what i'm doing
+// godspeed if you can read this shitcode
 </script>
 
 <template lang="pug">
@@ -28,7 +30,7 @@ button
   -moz-osx-font-smoothing grayscale
   color #2c3e50
   background-color #ecf0f1
-#app, #scene
+  margin 0 auto
   height 100vh
   width 100vw
 </style>
