@@ -4,10 +4,7 @@ import { ref } from 'vue'
 import { SHA3 } from 'sha3'
 import { Chacha20 } from 'ts-chacha20'
 import * as THREE from 'three'
-
-import * as seedrandom_ from 'seedrandom'
 import * as buffer from 'buffer'
-const Seedrandom = seedrandom_ // workaround??
 
 const hash = new SHA3(512)
 
