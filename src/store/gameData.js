@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 import HexGrid from '../game/objects/hexGrid'
-import * as Seedrandom from 'seedrandom'
 import { ref } from 'vue'
 import { SHA3 } from 'sha3'
 import * as THREE from 'three'
+
+import * as seedrandom_ from 'seedrandom'
+const Seedrandom = seedrandom_ // workaround??
+
 const hash = new SHA3(512)
 
 export const useGameDataStore = defineStore({
