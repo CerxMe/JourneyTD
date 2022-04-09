@@ -2,9 +2,11 @@ import { defineStore } from 'pinia'
 import HexGrid from '../game/objects/hexGrid'
 import { ref } from 'vue'
 import { SHA3 } from 'sha3'
+import { Chacha20 } from 'ts-chacha20'
 import * as THREE from 'three'
 
 import * as seedrandom_ from 'seedrandom'
+import * as buffer from 'buffer'
 const Seedrandom = seedrandom_ // workaround??
 
 const hash = new SHA3(512)
@@ -19,6 +21,7 @@ export const useGameDataStore = defineStore({
       },
       scale: 1.5
     },
+    seed: null,
     seedHash: null,
     rng: null,
     tiles: null,
@@ -89,19 +92,33 @@ export const useGameDataStore = defineStore({
 
     // The entropy is a string of random parameters generated from user's inputs
     setEntropy (entropy) {
-      // hashes the entropy and sets the seed
+      // this should be somewhat cryptographically secure PRNG, but I did not bother to verify this implementation
+
+      // hashes the input with SHA3
       hash.update(entropy.toString() || '')
       this.seedHash = hash.digest('hex')
-      hash.reset()
-      this.rng = null
-      this.rng = Seedrandom(this.seedHash)
+
+      // seeds the rng with the hash
+      this.seed = hash.digest() // gets the hash as binary
+      const key = this.seed.slice(0, 32)
+      const nonce = this.seed.slice(0, 12)
+
+      // a counter-based PRNG works by hashing the same message and incrementing a counter
+      this.rng = new Chacha20(key, nonce) // this should handle the incrementing by itself
+
+      hash.reset() // reset the block cypher
+
+      // regenerate initial view area
       this.generateTiles()
     },
 
     getRng () {
-      if (this.rng) {
-        const random = this.rng()
-        return random
+      if (this.rng && this.seed) {
+        const random = this.rng.encrypt(this.seed)
+        const number = buffer.Buffer.from(random).readUInt32LE(0)
+        // convert the number to a float between 0 and 1
+        // note: 4294967295 is the max value of a 32-bit unsigned integer
+        return number / 4294967295
       }
     },
     setSelectedObject (object) {
