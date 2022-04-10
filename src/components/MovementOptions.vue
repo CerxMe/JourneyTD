@@ -4,12 +4,11 @@
   .option(v-if="gameData.selectedObject")
     // hex coordinates
     header
-      | selection:
+      | selection: {{gameData.selectedObject}}
       .hex(:style="{'background-color': gameData.getSelectedObject.color}")
       span.hexCoords
-        | x: {{ Math.floor(gameData.getSelectedObject.position.x) }}
-        | y: {{ Math.floor(gameData.getSelectedObject.position.y) }}
-        | z: {{ Math.floor(gameData.getSelectedObject.position.z) }}
+        | q: {{ Math.floor(gameData.getSelectedObject.position.x) }}
+        | r: {{ Math.floor(gameData.getSelectedObject.position.y) }}
     // information about the move
     //main
     //  | {{ gameData.getMovementOptions }}

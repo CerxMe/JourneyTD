@@ -173,10 +173,10 @@ aside
   border-radius: 0.3em
   background-color: #fff
   cursor: cursor
-  display flex
-  flex-direction column
+  //display flex
+  //flex-direction column
   footer
-    display flex
+    //display flex
     flex-direction row
     font-size: 0.6em
     font-weight normal

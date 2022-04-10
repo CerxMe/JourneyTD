@@ -132,34 +132,34 @@ export default class Scene {
         this.gameData.setSelectedObject(null)
       }
 
-      if ((this.lastSelectedObject && this.gameData.selectedObject !== this.lastSelectedObject) || !this.gameData.selectedObject) {
-      // remove highlight
-        const highlight = this.scene.getObjectByProperty('name', 'highlight')
-        if (highlight) {
-          this.scene.remove(highlight)
-        }
-      }
-      if (this.gameData.selectedObject) {
-        const selectedObject = this.scene.getObjectByProperty('uuid', this.gameData.selectedObject)
-        if (selectedObject && selectedObject.uuid !== this.lastSelectedObject) {
-          const highlight = new THREE.PointsMaterial({
-          // color: 0xff00ff,
-            color: 0x000000,
-            alphaMap: this.highlightSprite,
-            alphaTest: 0.5,
-            transparent: true,
-            // size: 6.66
-            size: 16
-          })
-          // highlight.color.setHSL(1.0, 0.3, 0.7)
-
-          const sphere = new THREE.Points(selectedObject.geometry, highlight)
-          sphere.position.copy(selectedObject.position)
-          sphere.name = 'highlight'
-          this.scene.add(sphere)
-        }
-        this.lastSelectedObject = this.gameData.selectedObject
-      }
+      // if ((this.lastSelectedObject && this.gameData.selectedObject !== this.lastSelectedObject) || !this.gameData.selectedObject) {
+      // // remove highlight
+      //   const highlight = this.scene.getObjectByProperty('name', 'highlight')
+      //   if (highlight) {
+      //     this.scene.remove(highlight)
+      //   }
+      // }
+      // if (this.gameData.selectedObject) {
+      //   const selectedObject = this.scene.getObjectByProperty('uuid', this.gameData.selectedObject)
+      //   if (selectedObject && selectedObject.uuid !== this.lastSelectedObject) {
+      //     const highlight = new THREE.PointsMaterial({
+      //     // color: 0xff00ff,
+      //       color: 0x000000,
+      //       alphaMap: this.highlightSprite,
+      //       alphaTest: 0.5,
+      //       transparent: true,
+      //       // size: 6.66
+      //       size: 16
+      //     })
+      //     // highlight.color.setHSL(1.0, 0.3, 0.7)
+      //
+      //     const sphere = new THREE.Points(selectedObject.geometry, highlight)
+      //     sphere.position.copy(selectedObject.position)
+      //     sphere.name = 'highlight'
+      //     this.scene.add(sphere)
+      //   }
+      //   this.lastSelectedObject = this.gameData.selectedObject
+      // }
     }
   }
 

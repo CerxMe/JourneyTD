@@ -136,6 +136,18 @@ export default class Hex {
     this.material = !this.claimed ? claimedMaterial : unclaimedMaterial
   }
 
+  toggleHover (state) {
+    if (state) {
+      // this.color = new THREE.Color(0x00100b)
+      this.slopeRatio = 0.85
+      this.position.z = 1
+    } else {
+      this.slopeRatio = 0.75
+      this.position.z = 0
+    }
+    this.updateHexObject()
+  }
+
   updateGeometry () {
     // gets the 'Hexagonal frustum' shape (googled the proper geometry term)
     this.bottomFaceVertices = this.getHexCorners(this.dimensions.width, 0)
@@ -156,10 +168,16 @@ export default class Hex {
     this.updateMaterial()
 
     // combine all into a final mesh
-    const mesh = new THREE.Mesh(this.geometry, this.material)
-    mesh.position.set(this.position.x, this.position.y, this.position.z)
-    mesh.name = 'hex'
-    this.mesh = mesh
+    if (this.mesh) {
+      this.mesh.position.set(this.position.x, this.position.y, this.position.z)
+      this.mesh.geometry = this.geometry
+      this.mesh.material = this.material
+    } else {
+      const mesh = new THREE.Mesh(this.geometry, this.material)
+      mesh.position.set(this.position.x, this.position.y, this.position.z)
+      mesh.name = 'hex'
+      this.mesh = mesh
+    }
   }
 
   setColor (color) {

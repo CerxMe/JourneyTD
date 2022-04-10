@@ -23,12 +23,15 @@ const gameData = useGameDataStore()
     EndScreen(v-if="gameData.gameState === 'endScreen'" )
     .game(v-if="gameData.gameState === 'game'")
       nav.menu
-        ScaleSettings
-        MovementOptions
+        .body
+          ScaleSettings
+          MovementOptions
+        .seed Seed: {{ gameData.seedHash }}
 
 </template>
 
 <style lang="stylus" scoped>
+@import '../styles/utils.styl'
 @import '../styles/variables.styl'
 .gameContainer
   width: 100%
@@ -48,20 +51,33 @@ const gameData = useGameDataStore()
     align-items: center
     z-index: 5
 
-  .foreground, .game
-    position: absolute
-    bottom: 0
-    right: 0
-    width: 100%
-    height: 100%
-    display: flex
-    justify-content: center
-    align-items: center
-    z-index: 10
+  .foreground,  .game
+    width 100%
+    height 100%
+    z-index 10
+    flex()
   .game
+    flex-direction row
     justify-content start
-    .menu
-      background: alpha(color1, 0.5)
-      width: 300px
-      height 100%
+.menu
+  min-height: 100vh;
+  background: alpha(color1, 0.5)
+  width: 300px
+  height 100%
+  flex()
+  flex-direction column
+  justify-content end
+  .body
+    width 100%
+    flex()
+    flex-grow 1
+    justify-content start
+  .seed
+    color color5
+    flex()
+    flex-direction row
+    font-size: 0.6em
+    font-weight normal
+    word-break break-all
+    padding: 0.5em
 </style>

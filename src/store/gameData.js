@@ -6,6 +6,7 @@ import { Chacha20 } from 'ts-chacha20'
 import * as THREE from 'three'
 import * as buffer from 'buffer'
 import Selection from '../game/objects/selection'
+import { Vector3 } from 'three'
 
 const hash = new SHA3(512)
 
@@ -120,14 +121,37 @@ export const useGameDataStore = defineStore({
       }
     },
     setSelectedObject (object) {
-      this.selectedObject = object
+      if (this.selectedObject !== object) {
+        this.modifyObject(this.selectedObject, false)
+        if (object) {
+          this.selectedObject = object
+          this.modifyObject(object, true)
+        } else {
+          this.selectedObject = null
+        }
+      }
     },
-
+    modifyObject (objectId, state) {
+      const object = this.gameObjects.find(object => object.mesh.uuid === objectId)
+      if (object) {
+        object.toggleHover(state)// add a new object to the scene
+        // this.gameObjects = this.gameObjects.map(existingObject => {
+        //   if (existingObject.mesh.uuid === object.mesh.uuid) {
+        //     return object
+        //   }
+        //   return existingObject
+        // })
+      }
+    },
     updateCamera (scene) {
       this.scene = scene
     }
   },
   getters: {
+    getHash () {
+      console.log(this.seed)
+      return this.seedHash
+    },
     getObjects () {
       return this.gameObjects
     },

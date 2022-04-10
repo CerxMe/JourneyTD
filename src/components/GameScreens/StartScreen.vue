@@ -52,12 +52,14 @@ onUnmounted(() => {
 @import '../../styles/variables.styl'
 @import '../../styles/utils.styl'
 .start-screen
-  opacity: 0.5
+
   flex()
-    height 100%
-    width 100%
+  height 100%
+  min-width 600px
 
   header
+    flex()
+    width 100%
     padding 1em
     border-radius .3em
     background color1
@@ -68,12 +70,9 @@ onUnmounted(() => {
       font-size 1.5em
 
   footer
-    //justify-self flex-end
-    //position to the bottom right of the screen
-
-    flex()
     width 100%
-    height 100%
-  &:hover
-    opacity: 1
+    opacity: 0.5
+    flex()
+    &:hover
+      opacity: 1
 </style>
