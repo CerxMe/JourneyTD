@@ -2,7 +2,6 @@
 // Initializes a button for selecting the game seed value
 import { useGameDataStore } from '../store/gameData'
 import { ref, onMounted, onUnmounted } from 'vue'
-const emit = defineEmits(['inputFocused', 'inputBlurred', 'submitSeed'])
 
 const gameData = useGameDataStore()
 

@@ -13,8 +13,6 @@ function listener (event) {
 
 // TODO: Fix this mess
 function startGame (event) {
-  console.log('event', event)
-
   if ((startButtonHovered.value && event === 'click') || event === 'submit') {
     gameData.startGame()
   } else if (!startButtonHovered.value && event) {

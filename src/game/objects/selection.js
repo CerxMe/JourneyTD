@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import HexGrid from './hexGrid'
+
 export default class Selection {
   constructor (position) {
     this.selection = null

@@ -7,9 +7,9 @@ import GameCanvas from '~/components/GameCanvas.vue'
 import StartScreen from '~/components/GameScreens/StartScreen.vue'
 import EndScreen from '~/components/GameScreens/EndScreen.vue'
 import ScaleSettings from '~/components/ScaleSettings.vue'
+import MovementOptions from '../components/MovementOptions.vue'
 
 const gameData = useGameDataStore()
-console.log('GAME DATA', gameData.seed)
 </script>
 
 <template lang="pug">
@@ -22,11 +22,14 @@ console.log('GAME DATA', gameData.seed)
     StartScreen(v-if="gameData.gameState === 'startScreen'" )
     EndScreen(v-if="gameData.gameState === 'endScreen'" )
     .game(v-if="gameData.gameState === 'game'")
-      ScaleSettings
+      nav.menu
+        ScaleSettings
+        MovementOptions
 
 </template>
 
 <style lang="stylus" scoped>
+@import '../styles/variables.styl'
 .gameContainer
   width: 100%
   height: 100%
@@ -45,7 +48,7 @@ console.log('GAME DATA', gameData.seed)
     align-items: center
     z-index: 5
 
-  .foreground
+  .foreground, .game
     position: absolute
     bottom: 0
     right: 0
@@ -55,6 +58,10 @@ console.log('GAME DATA', gameData.seed)
     justify-content: center
     align-items: center
     z-index: 10
+  .game
+    justify-content start
     .menu
-      background red
+      background: alpha(color1, 0.5)
+      width: 300px
+      height 100%
 </style>

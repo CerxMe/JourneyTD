@@ -10,7 +10,7 @@ docs: [Notion](https://incredible-cabbage-74c.notion.site/Tower-Defence-game-f7c
 -------------------------------------
 ## Vue 3 + Vite
 [Vite](https://vitejs.dev/guide/), 
-uses  [Vue 3](https://v3.vuejs.org) `<script setup>` SFCs [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup), 
+uses  [Vue 3](https://v3.vuejs.org) with [<script setup>](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup), 
 [Vue Router 4](https://next.router.vuejs.org/guide/),
 [Pinia](https://pinia.vuejs.org/introduction.html) for state management,
 templates in [Pug](https://pugjs.org), styles in [Stylus](https://stylus-lang.com), 

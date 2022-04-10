@@ -4,7 +4,6 @@ import { toRaw } from '@vue/reactivity'
 export default class Scene {
   // initiates with the canvas element and the renderers the scene
   constructor (canvas, getGameData = () => null) {
-    console.log(getGameData)
     this.canvas = canvas
     this.gameData = getGameData()
     this.raycaster = new THREE.Raycaster()
@@ -12,6 +11,7 @@ export default class Scene {
     this.pointer = { x: -9999, y: -9999 } // set to -9999 to prevent registering pointer before mousemove
     this.highlightSprite = new THREE.TextureLoader().load('../../assets/hex_highlight.svg')
     this.subsription = null
+    this.clock = new THREE.Clock()
     this.setup()
   }
 
@@ -21,6 +21,7 @@ export default class Scene {
     console.log('draw scene')
     this.createScene()
     this.createCamera()
+    this.createAnimationMixer()
     this.updateCamera() // iherits the initial settings from the game data
     this.createRenderer()
     this.subscribeToData()
@@ -110,12 +111,13 @@ export default class Scene {
     // console.log('resize')
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.createCamera()
+    this.updateCamera()
   }
 
   update () {
     // console.log('update')
     this.renderGameObjects(this.gameData.getObjects)
-
+    this.animationMixer.update(this.clock.getDelta())
     // find intersections
     if (this.gameData.gameState === 'game') {
       this.raycaster.setFromCamera(this.pointer, this.camera)
@@ -267,5 +269,13 @@ export default class Scene {
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer = renderer
+  }
+
+  // handle animations
+  createAnimationMixer () {
+    this.animationMixer = new THREE.AnimationMixer(this.scene)
+    this.animationMixer.addEventListener('loop', (e) => {
+      // console.log(e)
+    })
   }
 }

@@ -5,6 +5,7 @@ import { SHA3 } from 'sha3'
 import { Chacha20 } from 'ts-chacha20'
 import * as THREE from 'three'
 import * as buffer from 'buffer'
+import Selection from '../game/objects/selection'
 
 const hash = new SHA3(512)
 
@@ -38,7 +39,7 @@ export const useGameDataStore = defineStore({
 
     // Prepares starting tiles
     generateTiles () {
-      const initialViewDistance = 3 // initial view distance
+      const initialViewDistance = 1 // initial view distance
       const gridCenter = new THREE.Vector3(0, 0, 0)
       const grid = new HexGrid(gridCenter)
       grid.createMap(initialViewDistance)
@@ -89,7 +90,7 @@ export const useGameDataStore = defineStore({
 
     // The entropy is a string of random parameters generated from user's inputs
     setEntropy (entropy) {
-      // this should be somewhat cryptographically secure PRNG, but I did not bother to verify this implementation
+      // should be somewhat cryptographically secure PRNG, but I did not bother to verify this implementation
 
       // hashes the input with SHA3
       hash.update(entropy.toString() || '')
@@ -101,7 +102,7 @@ export const useGameDataStore = defineStore({
       const nonce = this.seed.slice(0, 12)
 
       // a counter-based PRNG works by hashing the same message and incrementing a counter
-      this.rng = new Chacha20(key, nonce) // this should handle the incrementing by itself
+      this.rng = new Chacha20(key, nonce) // should handle the incrementing by itself
 
       hash.reset() // reset the block cypher
 
@@ -129,6 +130,28 @@ export const useGameDataStore = defineStore({
   getters: {
     getObjects () {
       return this.gameObjects
+    },
+    getSelectedObject () {
+      const object = this.gameObjects.find(object => object.mesh.uuid === this.selectedObject)
+      if (object) {
+        return object
+      }
+    },
+    getMovementOptions () {
+    // find the object's coordinates
+      if (this.selectedObject) {
+        const object = this.gameObjects.find(object => object.mesh.uuid === this.selectedObject)
+        const objectCoordinates = object.position
+        const movementOptions = []
+        const grid = new HexGrid(new THREE.Vector3(0, 0, 0))
+        const hexMap = grid.populatedHexes
+        for (const hex of hexMap) {
+          if (hex.coordinates.distanceTo(objectCoordinates) <= 1) {
+            movementOptions.push(hex)
+          }
+        }
+        return movementOptions
+      }
     }
   }
 })

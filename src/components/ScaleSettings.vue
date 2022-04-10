@@ -35,26 +35,34 @@ const onChange = (event) => {
 
 <template lang="pug">
 .container
-  //| {{ gameData.scene.scale }}
-  //button(@click="increaseScale(5)")
-  //  | -
-  //button(@click="decreaseScale(5)")
-  //  | +
+  | Scale:
+  | {{ gameData.scene.scale }}
+  button(@click="increaseScale(5)")
+    | -
+  button(@click="decreaseScale(5)")
+    | +
   //input.zoom-level(type="range", min="1", max="60", step="0.5",
   //  v-model="gameData.scene.scale", @change="onChange")
 </template>
 
 <style lang="stylus" scoped>
+@import '../styles/variables.styl'
+@import '../styles/utils.styl'
 .container
-  font-size: 1.5em
+  font-size: 1em
   margin: 0 auto
   width: 100%
   text-align: center
+  flex()
+  flex-direction row
+  background color1
+  color color2
+  padding: 0.3em
   button
     font-size: 1em
-    margin: 0.5em
-    padding: 0.5em
-    border: 1px solid #ccc
+    padding: 0.3em
+    min-width 22px
+    margin: auto 0.3em
     border-radius: 3px
-    background-color: #eee
+    background-color: color2
 </style>
