@@ -1,18 +1,25 @@
 import { defineStore } from 'pinia'
 
 export const usePlayerStore = defineStore({
-  id: 'gameData',
+  id: 'player',
   state: () => ({
-    position: null, // Hex object of the player's current tile position
-    unlocked: [], // Array of hex objects of the player's unlocked tiles
-    inventory: [], // Array of hex objects of the player's inventory
-    health: 100, // Player's current health
-    maxHealth: 100 // Player's maximum health
+    currentTile: null,
+    ownedTiles: []
   }),
   actions: {
-    // startGame() {
-    //     this.gameState = 'game'
-    //     console.log('game started with seed:', this.seedHash)
-    // },
+    startGame () {
+      this.currentTile = {
+        x: 0,
+        y: 0
+      }
+    }
+  },
+  getters: {
+    getCurrentTile () {
+      return this.currentTile
+    },
+    getOwnedTiles () {
+      return this.ownedTiles
+    }
   }
 })

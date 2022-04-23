@@ -26,11 +26,6 @@ onMounted(() => {
     }
   })
 })
-const onChange = (event) => {
-  // convert value to int
-  const value = parseInt(event.target.value)
-  gameData.scene.scale = value
-}
 </script>
 
 <template lang="pug">

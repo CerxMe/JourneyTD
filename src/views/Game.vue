@@ -10,6 +10,9 @@ import ScaleSettings from '~/components/ScaleSettings.vue'
 import MovementOptions from '../components/MovementOptions.vue'
 
 const gameData = useGameDataStore()
+const claimTile = () => {
+  gameData.claimTile(gameData.getSelectedObject)
+}
 </script>
 
 <template lang="pug">
@@ -21,7 +24,9 @@ const gameData = useGameDataStore()
   .foreground
     StartScreen(v-if="gameData.gameState === 'startScreen'" )
     EndScreen(v-if="gameData.gameState === 'endScreen'" )
-    .game(v-if="gameData.gameState === 'game'")
+    .game(v-if="gameData.gameState === 'game'"
+      @click="claimTile()"
+    )
       nav.menu
         .body
           ScaleSettings

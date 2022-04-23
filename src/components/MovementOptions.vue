@@ -7,11 +7,17 @@
       | selection: {{gameData.selectedObject}}
       .hex(:style="{'background-color': gameData.getSelectedObject.color}")
       span.hexCoords
-        | q: {{ Math.floor(gameData.getSelectedObject.position.x) }}
-        | r: {{ Math.floor(gameData.getSelectedObject.position.y) }}
+        | q: {{ gameData.getSelectedObject.position.x }}
+        | r: {{ gameData.getSelectedObject.position.y }}
     // information about the move
     //main
     //  | {{ gameData.getMovementOptions }}
+    main neighbors:
+      section(v-for="neighbor of gameData.neighbors" :key="neighbor")
+        .hex(:style="{'background-color': neighbor?.color}")
+        span.hexCoords
+        | q: {{ neighbor.position.x }}
+        | r: {{ neighbor.position.y }}
 </template>
 
 <script setup>

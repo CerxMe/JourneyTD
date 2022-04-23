@@ -9,7 +9,6 @@ export default class Scene {
     this.raycaster = new THREE.Raycaster()
     this.scale = 9
     this.pointer = { x: -9999, y: -9999 } // set to -9999 to prevent registering pointer before mousemove
-    this.highlightSprite = new THREE.TextureLoader().load('../../assets/hex_highlight.svg')
     this.subsription = null
     this.clock = new THREE.Clock()
     this.setup()
@@ -22,6 +21,7 @@ export default class Scene {
     this.createScene()
     this.createCamera()
     this.createAnimationMixer()
+    this.updateCamera() // iherits the initial settings from the game data
     this.updateCamera() // iherits the initial settings from the game data
     this.createRenderer()
     this.subscribeToData()
@@ -108,9 +108,7 @@ export default class Scene {
   }
 
   onWindowResize () {
-    // console.log('resize')
     this.renderer.setSize(window.innerWidth, window.innerHeight)
-    this.createCamera()
     this.updateCamera()
   }
 
@@ -119,6 +117,7 @@ export default class Scene {
     this.renderGameObjects(this.gameData.getObjects)
     this.animationMixer.update(this.clock.getDelta())
     // find intersections
+    let range = Math.PI * 3.33
     if (this.gameData.gameState === 'game') {
       this.raycaster.setFromCamera(this.pointer, this.camera)
 
@@ -126,41 +125,53 @@ export default class Scene {
       const intersects = this.gameData.scene.scale < 10 ? this.raycaster.intersectObjects(hexTiles) : []
 
       if (intersects.length > 0) {
-      // console.log(intersects)
+        // console.log(intersects)
         this.gameData.setSelectedObject(intersects[0].object.uuid)
       } else if (this.gameData.selectedObject) {
         this.gameData.setSelectedObject(null)
       }
-
-      // if ((this.lastSelectedObject && this.gameData.selectedObject !== this.lastSelectedObject) || !this.gameData.selectedObject) {
-      // // remove highlight
-      //   const highlight = this.scene.getObjectByProperty('name', 'highlight')
-      //   if (highlight) {
-      //     this.scene.remove(highlight)
-      //   }
-      // }
-      // if (this.gameData.selectedObject) {
-      //   const selectedObject = this.scene.getObjectByProperty('uuid', this.gameData.selectedObject)
-      //   if (selectedObject && selectedObject.uuid !== this.lastSelectedObject) {
-      //     const highlight = new THREE.PointsMaterial({
-      //     // color: 0xff00ff,
-      //       color: 0x000000,
-      //       alphaMap: this.highlightSprite,
-      //       alphaTest: 0.5,
-      //       transparent: true,
-      //       // size: 6.66
-      //       size: 16
-      //     })
-      //     // highlight.color.setHSL(1.0, 0.3, 0.7)
-      //
-      //     const sphere = new THREE.Points(selectedObject.geometry, highlight)
-      //     sphere.position.copy(selectedObject.position)
-      //     sphere.name = 'highlight'
-      //     this.scene.add(sphere)
-      //   }
-      //   this.lastSelectedObject = this.gameData.selectedObject
-      // }
+      range = Math.PI
     }
+    /* A hack to make the camera move around the scene. */
+    // get mouse position offset from center
+    const x = this.pointer.x <= -9000 ? 1 : this.pointer.x
+    const y = this.pointer.y <= -9000 ? 1 : this.pointer.y
+
+    const cameraData = this.gameData.scene.camera
+    this.camera.position.copy(cameraData.position)
+    const delta = this.clock.getElapsedTime()
+    this.camera.position.x = cameraData.position.x + Math.cos(delta) * range * x
+    this.camera.position.y = cameraData.position.y + Math.sin(delta) * range * y
+    this.camera.lookAt(cameraData.lookAt)
+
+    // if ((this.lastSelectedObject && this.gameData.selectedObject !== this.lastSelectedObject) || !this.gameData.selectedObject) {
+    // // remove highlight
+    //   const highlight = this.scene.getObjectByProperty('name', 'highlight')
+    //   if (highlight) {
+    //     this.scene.remove(highlight)
+    //   }
+    // }
+    // if (this.gameData.selectedObject) {
+    //   const selectedObject = this.scene.getObjectByProperty('uuid', this.gameData.selectedObject)
+    //   if (selectedObject && selectedObject.uuid !== this.lastSelectedObject) {
+    //     const highlight = new THREE.PointsMaterial({
+    //     // color: 0xff00ff,
+    //       color: 0x000000,
+    //       alphaMap: this.highlightSprite,
+    //       alphaTest: 0.5,
+    //       transparent: true,
+    //       // size: 6.66
+    //       size: 16
+    //     })
+    //     // highlight.color.setHSL(1.0, 0.3, 0.7)
+    //
+    //     const sphere = new THREE.Points(selectedObject.geometry, highlight)
+    //     sphere.position.copy(selectedObject.position)
+    //     sphere.name = 'highlight'
+    //     this.scene.add(sphere)
+    //   }
+    //   this.lastSelectedObject = this.gameData.selectedObject
+    // }
   }
 
   destroy () {
@@ -239,17 +250,19 @@ export default class Scene {
 
   updateCamera () {
     const scale = this.gameData.scene.scale
-    // console.log(scale)
+    // console.log(this.gameData.scene.camera.position)
     const browserWidth = window.innerWidth
     const browserHeight = window.innerHeight
     const aspect = browserWidth / browserHeight
-    const cameraData = this.gameData.scene.camera
-    this.camera.lookAt(cameraData.lookAt)
-    this.camera.position.copy(cameraData.position)
     this.camera.left = -scale * aspect
     this.camera.right = scale * aspect
     this.camera.top = scale
     this.camera.bottom = -scale
+
+    const cameraData = this.gameData.scene.camera
+    this.camera.position.copy(cameraData.position)
+    this.camera.lookAt(cameraData.lookAt)
+
     this.camera.updateProjectionMatrix()
   }
 

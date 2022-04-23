@@ -14,16 +14,22 @@ export default class HexGrid {
     const center = new THREE.Vector3(0, 0, 0)
     pts.push(center)
 
+    // outer hexes
     for (let i = 0; i <= initialRadius; i++) {
       pts.push(...this.ring(center, i))
     }
 
+    // convert points to hexes
     for (const point of pts) {
-      const hex = new Hex(point)
-      this.populatedHexes.push(hex)
+      this.addHex(point)
     }
 
-    console.log(`got ${this.populatedHexes.length} hexagons`)
+    // console.log(`got ${this.populatedHexes.length} hexagons`)
+  }
+
+  addHex (point) {
+    const hex = new Hex(point)
+    this.populatedHexes.push(hex)
   }
 
   ring (center, radius) {
@@ -45,42 +51,17 @@ export default class HexGrid {
           .multiplyScalar(ax)
           .addScaledVector(sideVector, sd)
           .applyAxisAngle(axis, angle * seg)
+          // offset from center
           .add(center)
+
+        // round values to 3 decimal places
+        pos.x = Math.round(pos.x * 1000) / 1000
+        pos.y = Math.round(pos.y * 1000) / 1000
+        pos.z = Math.round(pos.z * 1000) / 1000
         pts.push(pos)
+        // pts.push(pos)
       }
     }
     return pts
-  }
-
-  axialToCube (axial) {
-    // convert axial coordinates to cube coordinates
-    const x = axial.x
-    const z = axial.z
-    const y = -x - z
-    return new THREE.Vector3(x, y, z)
-  }
-
-  getHexByAxial (axial) {
-    // get the hexagon at the given axial coordinates
-    const q = axial.x
-    const r = axial.y
-    const index = q + r * (this.mapSize + (this.mapSize - 1))
-    return this.map[index]
-  }
-
-  getAdjacentHexToHex (hex) {
-    const cube = this.axialToCube(hex.axial)
-    const adjacentHexes = []
-    for (let i = 0; i < 6; i++) {
-      const adjCube = this.getAdjacentCube(cube, i)
-      const adjHex = this.getHex(adjCube)
-      adjacentHexes.push(adjHex)
-    }
-    return adjacentHexes
-  }
-
-  getCenterHex () {
-    const cube = new THREE.Vector3(this.mapSize / 2, this.mapSize / 2, this.mapSize / 2)
-    return this.getHex(cube)
   }
 }

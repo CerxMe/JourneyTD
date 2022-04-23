@@ -137,13 +137,11 @@ export default class Hex {
   }
 
   toggleHover (state) {
-    if (state) {
+    if (state) { // Hovering
       // this.color = new THREE.Color(0x00100b)
-      this.slopeRatio = 0.85
-      this.position.z = 1
-    } else {
+      this.slopeRatio = 1
+    } else { // Not hovering
       this.slopeRatio = 0.75
-      this.position.z = 0
     }
     this.updateHexObject()
   }
